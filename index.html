@@ -515,6 +515,10 @@ table.matrix tr:hover td{background:rgba(45,212,191,.03)}
     <select class="filter-select" id="actionFilterStatus" onchange="filterActions()">
       <option value="">Todos</option><option value="pending">Pendiente</option><option value="progress">En progreso</option><option value="done">Completado</option>
     </select>
+    <label>Filtrar por área:</label>
+    <select class="filter-select" id="actionFilterArea" onchange="filterActions()">
+      <option value="">Todas</option><option value="OP">Operaciones</option><option value="COM">Comercial</option><option value="BI">BI</option><option value="IT">IT</option><option value="TS">Tech Support</option><option value="FIN">Finanzas + Otros</option>
+    </select>
   </div>
   <div class="action-grid" id="actionGrid"></div>
 </section>
@@ -993,19 +997,26 @@ function openAreaCardModal(key){
     html+='<h4>Verbatims representativos</h4>';
     a.verbatims.forEach(v=>{html+='<div class="verbatim">'+v+'</div>'});
   }
-  // Planes de acción
+  // Planes de acción — sincronizados con Planes de Acción
   if(ctx&&ctx.acciones&&ctx.acciones.length){
     html+='<h4 style="margin-top:16px"><i class="fa-solid fa-list-check" style="color:var(--accent)"></i> Planes de acción</h4>';
-    ctx.acciones.forEach((ac,ai)=>{
-      const actId='card_'+key+'_'+ai;
+    ACTIONS.forEach(a=>{
+      if(!a.areas.includes(key))return;
+      const savedStatus=localStorage.getItem('action_status_'+a.id)||'pending';
+      const totalItems=a.actions.length;
+      let checkedItems=0;
+      a.actions.forEach((act,i)=>{if(localStorage.getItem(a.id+'_cb_'+i)==='true')checkedItems++});
+      const progressPct=Math.round(checkedItems/totalItems*100);
       html+='<div style="background:rgba(30,41,59,.4);border-radius:8px;padding:14px;margin-bottom:10px;border:1px solid rgba(45,212,191,.08)">';
-      html+='<div style="font-weight:600;color:#e2e8f0;font-size:14px;margin-bottom:4px">'+ac.titulo+'</div>';
-      html+='<div style="font-size:12px;color:var(--gray);margin-bottom:8px">'+ac.desc+'</div>';
+      html+='<div style="font-weight:600;color:#e2e8f0;font-size:14px;margin-bottom:4px">'+a.title+'</div>';
+      html+='<div style="font-size:12px;color:var(--gray);margin-bottom:8px">'+a.desc+'</div>';
+      // Barra de progreso
+      html+='<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--gray);margin-bottom:4px"><span>'+checkedItems+'/'+totalItems+'</span><span>'+progressPct+'%</span></div><div style="height:4px;background:rgba(100,116,139,.15);border-radius:2px;overflow:hidden"><div style="height:100%;width:'+progressPct+'%;background:linear-gradient(90deg,var(--mint),var(--emerald));border-radius:2px"></div></div></div>';
       html+='<ul style="list-style:none;padding:0">';
-      ac.items.forEach((item,j)=>{
-        const cbId=actId+'_'+j;
+      a.actions.forEach((item,j)=>{
+        const cbId=a.id+'_cb_'+j;
         const checked=localStorage.getItem(cbId)==='true'?'checked':'';
-        html+='<li style="display:flex;align-items:flex-start;gap:8px;padding:4px 0;font-size:13px;color:#cbd5e1"><input type="checkbox" id="'+cbId+'" '+checked+' onchange="localStorage.setItem(\''+cbId+'\',this.checked)" style="margin-top:3px;accent-color:var(--emerald);cursor:pointer"><label for="'+cbId+'" style="cursor:pointer">'+item+'</label></li>';
+        html+='<li style="display:flex;align-items:flex-start;gap:8px;padding:4px 0;font-size:13px;color:#cbd5e1"><input type="checkbox" id="modal_'+cbId+'" '+checked+' onchange="syncCheckbox(\''+cbId+'\',this.checked)" style="margin-top:3px;accent-color:var(--emerald);cursor:pointer"><label for="modal_'+cbId+'" style="cursor:pointer">'+item+'</label></li>';
       });
       html+='</ul></div>';
     });
@@ -1034,21 +1045,30 @@ function renderAreaContext(areaKey){
   html+='</ul></div></div>';
   // Insights
   html+='<div class="insight-box"><strong>Insights clave — '+ctx.name+'</strong> '+ctx.insights+'</div>';
-  // Acciones
-  html+='<h3 style="font-size:15px;font-weight:600;margin:20px 0 12px;color:#f1f5f9">Planes de acción relevantes</h3>';
+  // Acciones — sincronizadas con Planes de Acción
+  html+='<h3 style="font-size:15px;font-weight:600;margin:20px 0 12px;color:#f1f5f9">Planes de acción relevantes <span style="font-size:11px;color:var(--gray);font-weight:400">(sincronizado con tab Planes de Acción)</span></h3>';
   html+='<div class="action-grid">';
-  ctx.acciones.forEach((a,i)=>{
-    const actId='ctx_'+areaKey+'_'+i;
-    html+='<div class="action-card medium">';
-    html+='<div class="ac-header"><div class="ac-title">'+a.titulo+'</div><div class="ac-badge medium">Acción</div></div>';
+  ACTIONS.forEach(a=>{
+    if(!a.areas.includes(areaKey))return;
+    const savedStatus=localStorage.getItem('action_status_'+a.id)||'pending';
+    const totalItems=a.actions.length;
+    let checkedItems=0;
+    a.actions.forEach((act,i)=>{if(localStorage.getItem(a.id+'_cb_'+i)==='true')checkedItems++});
+    const progressPct=Math.round(checkedItems/totalItems*100);
+    html+='<div class="action-card '+a.priority+'" data-status="'+savedStatus+'">';
+    html+='<div class="ac-header"><div class="ac-title">'+a.title+'</div><div class="ac-badge '+a.priority+'">'+(a.priority==='high'?'ALTA':'MEDIA')+'</div></div>';
     html+='<div class="ac-desc">'+a.desc+'</div>';
+    // Barra de progreso
+    html+='<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--gray);margin-bottom:4px"><span>'+checkedItems+'/'+totalItems+' ítems completados</span><span>'+progressPct+'%</span></div><div style="height:4px;background:rgba(100,116,139,.15);border-radius:2px;overflow:hidden"><div style="height:100%;width:'+progressPct+'%;background:linear-gradient(90deg,var(--mint),var(--emerald));border-radius:2px;transition:width .3s"></div></div></div>';
     html+='<ul class="ac-actions">';
-    a.items.forEach((item,j)=>{
-      const cbId=actId+'_'+j;
+    a.actions.forEach((act,i)=>{
+      const cbId=a.id+'_cb_'+i;
       const checked=localStorage.getItem(cbId)==='true'?'checked':'';
-      html+='<li><input type="checkbox" id="'+cbId+'" '+checked+' onchange="localStorage.setItem(\''+cbId+'\',this.checked)"><label for="'+cbId+'">'+item+'</label></li>';
+      html+='<li><input type="checkbox" id="ctx_'+cbId+'" '+checked+' onchange="syncCheckbox(\''+cbId+'\',this.checked)"><label for="ctx_'+cbId+'">'+act+'</label></li>';
     });
-    html+='</ul></div>';
+    html+='</ul>';
+    html+='<div class="ac-footer"><div class="ac-impact">Estado: <span style="color:'+(savedStatus==='done'?'var(--emerald)':savedStatus==='progress'?'var(--amber)':'var(--gray)')+'">'+(savedStatus==='done'?'Completado':savedStatus==='progress'?'En progreso':'Pendiente')+'</span></div></div>';
+    html+='</div>';
   });
   html+='</div>';
   container.innerHTML=html;
@@ -1167,28 +1187,28 @@ function openSegmentModal(type,seg){
 
 // ===== ACTIONS =====
 const ACTIONS=[
-  {id:'act1',title:'Comunicación y comunicación de cambios',priority:'high',impact:'Alto',
+  {id:'act1',title:'Comunicación y comunicación de cambios',priority:'high',impact:'Alto',areas:['OP','COM','IT','TS','BI','FIN'],
    desc:'42% combinado identifica comunicación (29%) y comunicación de cambios (13%) como aspecto que necesita mayor consistencia. Es la principal área de mejora.',
    actions:['Diseñar protocolo de comunicación de cambios con plantillas y responsables','Crear canal centralizado de anuncios organizacionales','Implementar briefing quincenal de estado de la empresa','Definir matriz de audiencia: quién necesita saber qué y cuándo','Establecer feedback loop: encuesta de comunicación trimestral']},
-  {id:'act2',title:'Claridad de responsabilidades',priority:'high',impact:'Alto',
+  {id:'act2',title:'Claridad de responsabilidades',priority:'high',impact:'Alto',areas:['COM','IT','FIN','OP'],
    desc:'21% identifica la claridad de responsabilidades como aspecto que necesita consistencia. Los verbatims revelan fronteras difusas entre áreas.',
    actions:['Elaborar matriz RACI por proceso crítico','Definir límites de área y diagramas de interacción','Documentar descripciones de puesto actualizadas','Realizar taller de alineación de roles por área','Crear sistema de escalation path para solicitudes cross-funcionales']},
-  {id:'act3',title:'Reconocimiento y plan de carrera',priority:'high',impact:'Alto',
+  {id:'act3',title:'Reconocimiento y plan de carrera',priority:'high',impact:'Alto',areas:['IT','OP','BI','TS'],
    desc:'13% expresa dolor por reconocimiento. Colaboradores 3+ años tienen rec 3.9. Verbatims contundentes sobre falta de promociones y plan de carrera.',
    actions:['Diseñar plan de carrera por área con niveles y criterios objetivos','Implementar programa de reconocimiento mensual (público y privado)','Crear presupuesto de capacitación individual anual','Definir y comunicar criterios de promoción','Mapear trayectorias verticales y horizontales existentes','Encuesta de stay-interview para talento 2+ años']},
-  {id:'act4',title:'Organización y procesos',priority:'medium',impact:'Medio',
+  {id:'act4',title:'Organización y procesos',priority:'medium',impact:'Medio',areas:['OP','BI','COM'],
    desc:'18% identifica la organización como aspecto que necesita mayor consistencia. Relacionado con claridad de responsabilidades.',
    actions:['Mapear procesos críticos cross-funcionales','Identificar y eliminar duplicidad de esfuerzos','Implementar retrospectivas de proceso trimestrales','Optimizar flujos de aprobación']},
-  {id:'act5',title:'Forma de tomar decisiones',priority:'medium',impact:'Medio',
+  {id:'act5',title:'Forma de tomar decisiones',priority:'medium',impact:'Medio',areas:['BI','IT','COM'],
    desc:'16% identifica la forma de tomar decisiones como aspecto que necesita consistencia. La agilidad decisional es un diferenciador que puede estar erosionándose.',
    actions:['Definir niveles de decisión: autónomo, consultivo, colegiado','Documentar decisiones clave y racional en wiki interna','Capacitar líderes en marcos decisionales','Reducir capas de aprobación innecesarias']},
-  {id:'act6',title:'Visibilidad externa / Employee advocacy',priority:'high',impact:'Alto',
+  {id:'act6',title:'Visibilidad externa / Employee advocacy',priority:'high',impact:'Alto',areas:['OP','TS','BI','COM'],
    desc:'Los atributos más valiosos (personas 34%, cercanía 29%, confianza 42%) son invisibles externamente. El employee advocacy es la palanca de menor costo y mayor impacto.',
    actions:['Programa de employee advocacy con grupo 1-3 años como embajadores','Guía de contenido para redes sociales','Sesiones mensuales de storytelling interno','Kit de herramientas: plantillas de LinkedIn, hashtags, temas','Reconocer y amplificar contenido generado por empleados','Métricas: alcance, engagement, aplicaciones via referral']},
-  {id:'act7',title:'Prestaciones competitivas',priority:'medium',impact:'Medio',
+  {id:'act7',title:'Prestaciones competitivas',priority:'medium',impact:'Medio',areas:['IT','FIN'],
    desc:'Info contradictoria en Indeed ("solo los de ley"). 3% interno menciona salarios como inconsistencia. Necesita investigación antes de comunicación.',
    actions:['Benchmark salarial vs. mercado tech/retail en México','Auditar prestaciones: identificar gaps vs. competencia','Diseñar paquete de prestaciones diferenciado','Comunicar valor total del paquete (salario + prestaciones + flexibilidad)','Investigar y responder claims en Indeed/Glassdoor']},
-  {id:'act8',title:'Onboarding consistente',priority:'medium',impact:'Medio',
+  {id:'act8',title:'Onboarding consistente',priority:'medium',impact:'Medio',areas:['OP','IT','TS','COM','BI','FIN'],
    desc:'Los colaboradores con menos de 3 meses reportan experiencia 7.8 (la más baja). El onboarding es irregular y afecta la primera impresión.',
    actions:['Diseñar journey de onboarding 30-60-90 días','Crear checklist de onboarding por área','Asignar buddy/onboarding partner formal','Documentar knowledge base de procesos y herramientas','Encuesta de onboarding a 30 y 60 días','Session de bienvenida mensual con liderazgo']}
 ];
@@ -1198,9 +1218,13 @@ function renderActions(){
   let html='';
   ACTIONS.forEach(a=>{
     const savedStatus=localStorage.getItem('action_status_'+a.id)||'pending';
-    html+='<div class="action-card '+a.priority+'" data-priority="'+a.priority+'" data-status="'+savedStatus+'" id="'+a.id+'">';
+    const areaLabels=a.areas.map(code=>{const ctx=AREA_CONTEXT[code];return ctx?ctx.name:code});
+    html+='<div class="action-card '+a.priority+'" data-priority="'+a.priority+'" data-status="'+savedStatus+'" data-areas="'+a.areas.join(',')+'" id="'+a.id+'">';
     html+='<div class="ac-header"><div class="ac-title">'+a.title+'</div><div class="ac-badge '+a.priority+'">'+(a.priority==='high'?'Prioridad ALTA':'Prioridad MEDIA')+'</div></div>';
     html+='<div class="ac-desc">'+a.desc+'</div>';
+    html+='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">';
+    a.areas.forEach(code=>{const ctx=AREA_CONTEXT[code];html+='<span style="padding:3px 8px;border-radius:12px;font-size:10px;background:rgba(45,212,191,.08);color:var(--mint);border:1px solid rgba(45,212,191,.15)">'+(ctx?ctx.name:code)+'</span>'});
+    html+='</div>';
     html+='<ul class="ac-actions">';
     a.actions.forEach((act,i)=>{
       const cbId=a.id+'_cb_'+i;
@@ -1214,7 +1238,7 @@ function renderActions(){
   });
   grid.innerHTML=html;
 }
-function saveCheckbox(id){localStorage.setItem(id,document.getElementById(id).checked)}
+function saveCheckbox(id){localStorage.setItem(id,document.getElementById(id).checked);refreshAreaContextIfOpen()}
 function saveActionStatus(id,val){
   localStorage.setItem('action_status_'+id,val);
   const card=document.getElementById(id);
@@ -1222,15 +1246,34 @@ function saveActionStatus(id,val){
   const sel=card.querySelector('.ac-status');
   sel.className='ac-status '+val;
   filterActions();
+  refreshAreaContextIfOpen();
 }
 function filterActions(){
   const fp=document.getElementById('actionFilterPriority').value;
   const fs=document.getElementById('actionFilterStatus').value;
+  const fa=document.getElementById('actionFilterArea').value;
   document.querySelectorAll('.action-card').forEach(c=>{
     const showP=!fp||c.dataset.priority===fp;
     const showS=!fs||c.dataset.status===fs;
-    c.style.display=(showP&&showS)?'':'none';
+    const cardAreas=(c.dataset.areas||'').split(',');
+    const showA=!fa||cardAreas.includes(fa);
+    c.style.display=(showP&&showS&&showA)?'':'none';
   });
+}
+function refreshAreaContextIfOpen(){
+  const selector=document.getElementById('areaContextSelector');
+  if(selector&&document.getElementById('hall-context').classList.contains('active')){
+    renderAreaContext(selector.value);
+  }
+}
+function syncCheckbox(cbId,checked){
+  localStorage.setItem(cbId,checked);
+  // Actualizar también el checkbox en Planes de Acción si existe
+  const planCb=document.getElementById(cbId);
+  if(planCb)planCb.checked=checked;
+  // Re-renderizar el contexto para actualizar barra de progreso
+  const selector=document.getElementById('areaContextSelector');
+  if(selector)renderAreaContext(selector.value);
 }
 
 // ===== ACCORDION =====
