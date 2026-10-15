@@ -360,6 +360,7 @@ table.matrix tr:hover td{background:rgba(45,212,191,.03)}
   <button class="tab-btn" data-tab="tab4">Análisis por Segmentos</button>
   <button class="tab-btn" data-tab="tab5">Planes de Acción</button>
   <button class="tab-btn" data-tab="tab6">Fase del Análisis</button>
+  <button class="tab-btn" data-tab="tab7">Anexo de Datos</button>
 </nav>
 
 <!-- ===== TAB 1: RESUMEN EJECUTIVO ===== -->
@@ -407,6 +408,7 @@ table.matrix tr:hover td{background:rgba(45,212,191,.03)}
   <div class="subtab-nav">
     <button class="subtab-btn active" data-subtab="hall-antig">Hallazgos por Antigüedad</button>
     <button class="subtab-btn" data-subtab="hall-tipo">Hallazgos por Tipo de Actividad</button>
+    <button class="subtab-btn" data-subtab="hall-area">Hallazgos por Área</button>
     <button class="subtab-btn" data-subtab="hall-context">Contexto por Área</button>
   </div>
 
@@ -438,6 +440,22 @@ table.matrix tr:hover td{background:rgba(45,212,191,.03)}
           </tr>
         </thead>
         <tbody id="hallazgosTipoBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Subtab: Hallazgos por Área -->
+  <div class="subtab-content" id="hall-area">
+    <div class="matrix-wrap">
+      <h3>Matriz de Hallazgos por Área</h3>
+      <p>Intensidad del hallazgo por área. Verde = fortaleza · Rojo = área de mejora · — = no significativo</p>
+      <table class="matrix" id="hallazgosAreaTable">
+        <thead>
+          <tr>
+            <th>Hallazgo</th><th>Transversal</th><th>Operaciones</th><th>Comercial</th><th>BI</th><th>IT</th><th>Tech Support</th><th>Finanzas + Otros</th>
+          </tr>
+        </thead>
+        <tbody id="hallazgosAreaBody"></tbody>
       </table>
     </div>
   </div>
@@ -597,6 +615,45 @@ table.matrix tr:hover td{background:rgba(45,212,191,.03)}
   <div class="accordion" id="accordion"></div>
   <div class="insight-box" style="margin-top:20px">
     <strong>Insight de cierre:</strong> Estas 26 preguntas, distribuidas en 8 dimensiones, constituyen el marco analítico para profundizar el diagnóstico. Las dimensiones de Brecha interno/externo, Reconocimiento/carrera y Prestaciones son las más urgentes dado que concentran los hallazgos críticos del estudio cuantitativo.
+  </div>
+</section>
+
+<!-- ===== TAB 7: ANEXO DE DATOS ===== -->
+<section class="tab-content" id="tab7">
+  <div class="subtab-nav">
+    <button class="subtab-btn active" data-subtab="anx-freq">Frecuencias</button>
+    <button class="subtab-btn" data-subtab="anx-seg">Métricas por Segmento</button>
+    <button class="subtab-btn" data-subtab="anx-dist">Distribuciones</button>
+  </div>
+
+  <div class="subtab-content active" id="anx-freq">
+    <div class="chart-box" style="margin-bottom:16px"><h3>Radar: Aspectos que Ayudan al Trabajo (P5)</h3><div class="chart-canvas-wrap radar"><canvas id="radarP5"></canvas></div></div>
+    <div class="chart-box" style="margin-bottom:16px"><h3>Radar: Aspectos Valiosos (P12)</h3><div class="chart-canvas-wrap radar"><canvas id="radarP12"></canvas></div></div>
+    <div class="chart-row">
+      <div class="chart-box"><h3>Elementos Distintivos (P15)</h3><div class="chart-canvas-wrap tall"><canvas id="barP15"></canvas></div></div>
+      <div class="chart-box"><h3>Características Culturales (P17)</h3><div class="chart-canvas-wrap tall"><canvas id="barP17"></canvas></div></div>
+    </div>
+    <div class="chart-row">
+      <div class="chart-box"><h3>Aspectos que Necesitan Consistencia (P21)</h3><div class="chart-canvas-wrap tall"><canvas id="barP21"></canvas></div></div>
+      <div class="chart-box"><h3>Motivadores (P10)</h3><div class="chart-canvas-wrap tall"><canvas id="barP10"></canvas></div></div>
+    </div>
+  </div>
+
+  <div class="subtab-content" id="anx-seg">
+    <div class="chart-box" style="margin-bottom:16px"><h3>Experiencia y Recomendación por Área</h3><div class="chart-canvas-wrap"><canvas id="grpArea"></canvas></div></div>
+    <div class="chart-box" style="margin-bottom:16px"><h3>Experiencia y Recomendación por Antigüedad</h3><div class="chart-canvas-wrap"><canvas id="grpAntig"></canvas></div></div>
+    <div class="chart-box" style="margin-bottom:16px"><h3>Experiencia y Recomendación por Tipo de Actividad</h3><div class="chart-canvas-wrap"><canvas id="grpTipo"></canvas></div></div>
+  </div>
+
+  <div class="subtab-content" id="anx-dist">
+    <div class="chart-row">
+      <div class="chart-box"><h3>Distribución de Experiencia (1-10)</h3><div class="chart-canvas-wrap"><canvas id="distExp"></canvas></div></div>
+      <div class="chart-box"><h3>Distribución de Recomendación (1-5) — Donut</h3><div class="chart-canvas-wrap"><canvas id="distRecDonut"></canvas></div></div>
+    </div>
+    <div class="chart-row">
+      <div class="chart-box"><h3>Distribución por Área — Donut</h3><div class="chart-canvas-wrap"><canvas id="distAreaDonut"></canvas></div></div>
+      <div class="chart-box"><h3>Distribución por Antigüedad — Donut</h3><div class="chart-canvas-wrap"><canvas id="distAntigDonut"></canvas></div></div>
+    </div>
   </div>
 </section>
 
@@ -1768,11 +1825,13 @@ renderAccordion();
 // Tab 2: Hallazgos matrices
 renderHallazgosMatrix('hallazgosAntigBody',['Transversal','\u003C3 meses','3-6 meses','6-12 meses','1-3 a\u00F1os','3+ a\u00F1os'],HALLAZGOS.map(h=>h.antig),[38,4,3,6,13,12]);
 renderHallazgosMatrix('hallazgosTipoBody',['Transversal','Ejecuci\u00F3n','Especialista','Ejec+Esp','Multirol','Gu\u00EDa/Lead'],HALLAZGOS.map(h=>h.tipo_act),[38,20,8,3,4,3]);
+renderHallazgosMatrix('hallazgosAreaBody',['Transversal','Operaciones','Comercial','BI','IT','Tech Support','Finanzas + Otros'],HALLAZGOS.map(h=>h.area),[38,9,8,6,6,5,4]);
 renderAreaContext('OP');
 renderPatrones();
 renderVerbatimsCompare();
 initTab1Charts();
 initSegmentCharts();
+initAnexoCharts();
 </script>
 </body>
 </html>
