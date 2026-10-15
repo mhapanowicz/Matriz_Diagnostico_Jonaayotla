@@ -250,17 +250,51 @@ table.matrix tr:hover td{background:rgba(45,212,191,.03)}
 .priority-filter-row{display:flex;gap:12px;margin-bottom:16px;align-items:center}
 .priority-filter-row label{font-size:13px;color:var(--gray)}
 .empty-state{text-align:center;padding:40px;color:var(--gray);font-size:14px}
+/* ===== PERFIL PROMOTOR ===== */
+.promotor-section{margin-top:24px}
+.promotor-header{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.promotor-header h2{font-size:22px;font-weight:800;color:#f1f5f9;letter-spacing:-.3px}
+.promotor-header .promotor-badge{padding:6px 14px;border-radius:20px;background:rgba(16,185,129,.12);color:var(--accent);font-size:12px;font-weight:600;border:1px solid rgba(16,185,129,.2)}
+.promotor-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.promotor-stat{background:linear-gradient(135deg,var(--navy) 0%,var(--dark) 100%);border-radius:10px;padding:16px;text-align:center;border:1px solid rgba(45,212,191,.1);border-top:3px solid var(--emerald)}
+.promotor-stat .ps-value{font-size:28px;font-weight:800;color:#f1f5f9;line-height:1.1}
+.promotor-stat .ps-value span{font-size:14px;color:var(--gray);font-weight:500}
+.promotor-stat .ps-label{font-size:11px;color:var(--gray);margin-top:4px;text-transform:uppercase;letter-spacing:.5px}
+.patrones-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:24px}
+.patron-card{background:rgba(30,41,59,.6);backdrop-filter:blur(12px);border-radius:10px;padding:18px;border:1px solid rgba(45,212,191,.08);border-left:4px solid var(--emerald);transition:transform .2s,box-shadow .2s}
+.patron-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.3)}
+.patron-card .patron-num{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:rgba(16,185,129,.15);color:var(--accent);font-size:13px;font-weight:700;margin-bottom:10px}
+.patron-card .patron-title{font-size:15px;font-weight:600;color:#f1f5f9;margin-bottom:6px}
+.patron-card .patron-desc{font-size:13px;color:#94a3b8;line-height:1.6;margin-bottom:10px}
+.patron-card .patron-breach{display:flex;gap:16px;margin-bottom:10px;padding:8px 12px;background:rgba(45,212,191,.05);border-radius:6px}
+.patron-card .patron-breach .pb-item{font-size:12px;color:#cbd5e1}
+.patron-card .patron-breach .pb-item strong{color:var(--accent);font-weight:600}
+.patron-card .patron-insight{font-size:12px;color:var(--mint);line-height:1.5;padding:10px 12px;background:rgba(16,185,129,.06);border-radius:6px;border:1px solid rgba(16,185,129,.1)}
+.verbatims-compare{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.verbatims-col{background:rgba(30,41,59,.6);backdrop-filter:blur(12px);border-radius:10px;padding:16px;border:1px solid rgba(45,212,191,.08)}
+.verbatims-col.prom{border-top:3px solid var(--emerald)}
+.verbatims-col.noprom{border-top:3px solid var(--amber)}
+.verbatims-col h4{font-size:14px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.verbatims-col.prom h4{color:var(--accent)}
+.verbatims-col.noprom h4{color:var(--amber)}
+.verbatims-col .v-item{font-style:italic;color:#cbd5e1;background:rgba(45,212,191,.04);border-left:3px solid var(--teal);padding:10px 14px;border-radius:6px;margin:8px 0;font-size:12px;line-height:1.6}
+.verbatims-col.noprom .v-item{border-left-color:var(--amber)}
+.click-hint{font-size:11px;color:var(--gray);margin-top:6px;text-align:center;opacity:.7}
 @media(max-width:1024px){
   .kpi-grid{grid-template-columns:repeat(2,1fr)}
   .finding-grid{grid-template-columns:repeat(2,1fr)}
   .chart-row,.segment-grid,.donut-grid{grid-template-columns:1fr}
   .action-grid{grid-template-columns:1fr}
   .area-cards-grid{grid-template-columns:1fr}
+  .promotor-stats{grid-template-columns:repeat(2,1fr)}
+  .patrones-grid{grid-template-columns:1fr}
+  .verbatims-compare{grid-template-columns:1fr}
 }
 @media(max-width:640px){
   .kpi-grid{grid-template-columns:1fr}
   .finding-grid{grid-template-columns:1fr}
   .tab-btn{padding:10px 14px;font-size:12px}
+  .promotor-stats{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -305,8 +339,24 @@ table.matrix tr:hover td{background:rgba(45,212,191,.03)}
   </div>
 
   <div class="chart-row">
-    <div class="chart-box"><h3>Distribución de Experiencia (1-10)</h3><div class="chart-canvas-wrap"><canvas id="chartExpDist"></canvas></div></div>
-    <div class="chart-box"><h3>Distribución de Recomendación (1-5)</h3><div class="chart-canvas-wrap"><canvas id="chartRecDist"></canvas></div></div>
+    <div class="chart-box"><h3>Distribución de Experiencia (1-10)</h3><div class="chart-canvas-wrap"><canvas id="chartExpDist"></canvas></div><div class="click-hint">💡 Haz clic en una barra para ver el perfil del promotor</div></div>
+    <div class="chart-box"><h3>Distribución de Recomendación (1-5)</h3><div class="chart-canvas-wrap"><canvas id="chartRecDist"></canvas></div><div class="click-hint">💡 Haz clic en una barra para ver el perfil del promotor</div></div>
+  </div>
+
+  <!-- ===== PERFIL PROMOTOR ===== -->
+  <div class="promotor-section" id="promotorSection">
+    <div class="promotor-header">
+      <h2>Perfil Promotor</h2>
+      <span class="promotor-badge">n=24 promotores · 63% del total</span>
+    </div>
+    <div class="promotor-stats">
+      <div class="promotor-stat"><div class="ps-value">24<span>/38</span></div><div class="ps-label">Promotores</div></div>
+      <div class="promotor-stat"><div class="ps-value">9.5<span>/10</span></div><div class="ps-label">Exp. Promotores</div></div>
+      <div class="promotor-stat"><div class="ps-value">4.8<span>/5</span></div><div class="ps-label">Rec. Promotores</div></div>
+      <div class="promotor-stat"><div class="ps-value">14<span>/38</span></div><div class="ps-label">No Promotores</div></div>
+    </div>
+    <div class="patrones-grid" id="patronesGrid"></div>
+    <div class="verbatims-compare" id="verbatimsCompare"></div>
   </div>
 </section>
 
@@ -1211,6 +1261,117 @@ function toggleAccordion(i){
   document.getElementById('acc'+i).classList.toggle('open');
 }
 
+// ===== PERFIL PROMOTOR DATA =====
+const PROMOTOR_PATTERNS=[
+  {num:1,title:'Las personas como ancla de valor',desc:'El 46% de los promotores menciona "las personas" como aspecto más valioso, frente a 14% de no promotores (brecha de 32 puntos). Además, 12% de promotores menciona "cercanía" vs 0% de no promotores.',breach:{prom:'46%',noprom:'14%',gap:'+32pts'},insight:'La recomendación de GetIn está anclada en la calidad de las relaciones humanas, no en la calidad de los proyectos. Los promotores recomiendan GetIn porque sienten conexión humana, no porque el trabajo sea interesante.'},
+  {num:2,title:'La confianza como habilitador de experiencia',desc:'50% de promotores identifica "la confianza" como aspecto que les ayuda a trabajar, vs 29% de no promotores (brecha de 21 puntos). La confianza se asocia con autonomía, crecimiento y compromiso.',breach:{prom:'50%',noprom:'29%',gap:'+21pts'},insight:'La confianza no es un valor abstracto para los promotores: es un mecanismo operativo que les permite hacer mejor su trabajo. Debe mostrarse en acción, no como eslogan.'},
+  {num:3,title:'El conocimiento compartido como multiplicador',desc:'29% de promotores valora "el conocimiento y experiencia de las personas" vs 7% de no promotores (22 puntos de brecha, la mayor de todas). Aprendizaje peer-to-peer como diferenciador.',breach:{prom:'29%',noprom:'7%',gap:'+22pts'},insight:'En los promotores opera una dinámica de aprendizaje peer-to-peer que los no promotores no experimentan con la misma intensidad. Formalizar este intercambio extendería el beneficio a todo el equipo.'},
+  {num:4,title:'Cultura colaborativa como identidad vivida',desc:'62% de promotores describe la cultura como "colaborativa" vs 36% de no promotores (27 puntos). 29% la describe como "flexible" vs 14%. La colaboración no es un valor aspiracional: es una práctica vivida.',breach:{prom:'62%',noprom:'36%',gap:'+27pts'},insight:'La cultura colaborativa es el "lenguaje" de los promotores. Cuando se vive como identidad real, la recomendación se activa. El reto es garantizar que todos la experimenten de forma consistente.'},
+  {num:5,title:'Impacto + acompañamiento como motor motivacional',desc:'46% de promotores menciona "el impacto de mi trabajo" como motivador vs 29% de no promotores. El liderazgo/acompañamiento aparece en 17% de promotores vs 0% de no promotores.',breach:{prom:'46%',noprom:'29%',gap:'+17pts'},insight:'El impacto percibido y el acompañamiento del líder son catalizadores de la recomendación. Cuando un colaborador siente impacto Y respaldo, la probabilidad de recomendar GetIn se dispara.'},
+  {num:6,title:'El ambiente como factor de retención',desc:'42% de promotores identifica "el ambiente" como factor para quedarse vs 14% de no promotores (27 puntos). "La forma de trabajar" aparece en 33% vs 7%. Los promotores se quedan por cómo es trabajar, no por en qué trabajan.',breach:{prom:'42%',noprom:'14%',gap:'+27pts'},insight:'El ambiente de trabajo es el factor de retención más poderoso para los promotores. Protegerlo es una decisión estratégica, no un beneficio accesorio.'},
+  {num:7,title:'Menor fricción con comunicación ("colchón afectivo")',desc:'Los no promotores señalan inconsistencias en comunicación (43% vs 21%), toma de decisiones (29% vs 8%) y organización (29% vs 12%) con mayor frecuencia. Los promotores tienen un "colchón afectivo" que amortigua las fricciones.',breach:{prom:'21%',noprom:'43%',gap:'-22pts'},insight:'Los promotores no son ciegos a los problemas —los ven y los nombran— pero su conexión con las personas les da una reserva de buena voluntad. Mejorar la comunicación es necesario pero no suficiente sin el colchón afectivo.'}
+];
+
+const PROMOTOR_VERBATIMS={
+  promotor:[
+    '"Porque estará en un ambiente de trabajo sano."',
+    '"En un ambiente tan positivo y retador, me gustaría agrandar el equipo con personas que sé que pueden dar el nivel."',
+    '"Amor trabajar aquí."',
+    '"Porque son pocas las veces que me he sentido poco valorada o respetada."',
+    '"Mi experiencia en la empresa ha sido muy satisfactoria. Prácticamente estamos la mayor parte de nuestra vida trabajando, lo mejor es crear un segundo hogar."',
+    '"Me gusta mi trabajo, enfrento desafíos cada día pero tengo el respaldo tanto del equipo como de los líderes para lograr cada nuevo reto."'
+  ],
+  nopromotor:[
+    '"No veo un plan de carrera a largo plazo. No hay promociones, capacitaciones, reconocimiento."',
+    '"GetIn no es para todos, porque se requiere una actitud flexible, iniciativa y disposición para adaptarse constantemente a los cambios."',
+    '"Porque depende el área a la que la recomendaría."',
+    '"Los salarios son bajos."',
+    '"Por las áreas de oportunidad que todavía tiene la empresa."',
+    '"Porque considero que es una empresa que sigue creciendo e innovando constantemente. Al mismo tiempo, creo que existe una oportunidad de mejorar la organización y coordinación entre los líderes de las distintas áreas."'
+  ]
+};
+
+const PROMOTOR_MODAL_DATA={
+  exp:{
+    '10':{type:'promotor',title:'Experiencia 10/10 — Promotor Puro',desc:'24 personas (63%) califican con 9-10. La experiencia perfecta está anclada en relaciones humanas, confianza y ambiente.',patterns:[1,2,4,6],verbatims:PROMOTOR_VERBATIMS.promotor.slice(0,3)},
+    '9':{type:'promotor',title:'Experiencia 9/10 — Promotor',desc:'En el umbral promotor. La experiencia es alta pero no perfecta — el "colchón afectivo" compensa fricciones menores.',patterns:[4,5,7],verbatims:PROMOTOR_VERBATIMS.promotor.slice(2,5)},
+    '8':{type:'nopromotor',title:'Experiencia 8/10 — No Promotor',desc:'Experiencia sólida pero por debajo del umbral promotor (≥9). Se sienten cómodos pero no conectan afectivamente al mismo nivel.',patterns:[3,7],verbatims:PROMOTOR_VERBATIMS.nopromotor.slice(0,2)},
+    '7':{type:'nopromotor',title:'Experiencia 7/10 — No Promotor',desc:'Experiencia por debajo del promedio. Fricciones con comunicación, organización o claridad de rol pesan más que el ambiente.',patterns:[7],verbatims:PROMOTOR_VERBATIMS.nopromotor.slice(1,3)},
+    '6':{type:'nopromotor',title:'Experiencia 6/10 — No Promotor',desc:'Experiencia baja. Los factores transaccionales (plan de carrera, reconocimiento) pesan más que los afectivos.',patterns:[5,7],verbatims:PROMOTOR_VERBATIMS.nopromotor.slice(0,2)},
+    '4':{type:'nopromotor',title:'Experiencia 4/10 — Detractor',desc:'Experiencia muy baja. Verbatims contundentes sobre falta de reconocimiento y plan de carrera. Requiere intervención urgente.',patterns:[7],verbatims:['"No veo un plan de carrera a largo plazo. No hay promociones, capacitaciones, reconocimiento."','"Los salarios son bajos."']}
+  },
+  rec:{
+    '5':{type:'promotor',title:'Recomendación 5/5 — Promotor Entusiasta',desc:'63% del equipo. Recomendación máxima anclada en conexión afectiva, ambiente humano y confianza vivida.',patterns:[1,2,4,6],verbatims:PROMOTOR_VERBATIMS.promotor.slice(0,3)},
+    '4':{type:'promotor',title:'Recomendación 4/5 — Promotor',desc:'Recomendación alta pero con reservas. Ven los problemas pero el "colchón afectivo" sostiene la recomendación.',patterns:[4,5,7],verbatims:PROMOTOR_VERBATIMS.promotor.slice(3,6)},
+    '3':{type:'nopromotor',title:'Recomendación 3/5 — No Promotor',desc:'Recomendación neutral. El engagement con el producto existe pero la frustración operativa pesa.',patterns:[3,7],verbatims:PROMOTOR_VERBATIMS.nopromotor.slice(0,2)},
+    '2':{type:'nopromotor',title:'Recomendación 2/5 — Detractor',desc:'Baja recomendación. Fricciones estructurales sin colchón afectivo que las amortigüe.',patterns:[7],verbatims:PROMOTOR_VERBATIMS.nopromotor.slice(2,4)},
+    '1':{type:'detractor',title:'Recomendación 1/5 — Detractor Crítico',desc:'Recomendación mínima. Dolor transaccional agudo: plan de carrera, salarios, reconocimiento. Requiere intervención inmediata.',patterns:[7],verbatims:['"No veo un plan de carrera a largo plazo. No hay promociones, capacitaciones, reconocimiento."','"Los salarios son bajos."']}
+  }
+};
+
+function renderPatrones(){
+  const grid=document.getElementById('patronesGrid');
+  if(!grid)return;
+  let html='';
+  PROMOTOR_PATTERNS.forEach(p=>{
+    html+='<div class="patron-card">';
+    html+='<div class="patron-num">'+p.num+'</div>';
+    html+='<div class="patron-title">'+p.title+'</div>';
+    html+='<div class="patron-desc">'+p.desc+'</div>';
+    html+='<div class="patron-breach">';
+    html+='<div class="pb-item">Promotores: <strong>'+p.breach.prom+'</strong></div>';
+    html+='<div class="pb-item">No promotores: <strong>'+p.breach.noprom+'</strong></div>';
+    html+='<div class="pb-item">Brecha: <strong>'+p.breach.gap+'</strong></div>';
+    html+='</div>';
+    html+='<div class="patron-insight"><i class="fa-solid fa-lightbulb" style="margin-right:6px"></i>'+p.insight+'</div>';
+    html+='</div>';
+  });
+  grid.innerHTML=html;
+}
+
+function renderVerbatimsCompare(){
+  const container=document.getElementById('verbatimsCompare');
+  if(!container)return;
+  let html='';
+  html+='<div class="verbatims-col prom">';
+  html+='<h4><i class="fa-solid fa-thumbs-up"></i> Cómo hablan los Promotores</h4>';
+  PROMOTOR_VERBATIMS.promotor.forEach(v=>{html+='<div class="v-item">'+v+'</div>'});
+  html+='</div>';
+  html+='<div class="verbatims-col noprom">';
+  html+='<h4><i class="fa-solid fa-thumbs-down"></i> Cómo hablan los No Promotores</h4>';
+  PROMOTOR_VERBATIMS.nopromotor.forEach(v=>{html+='<div class="v-item">'+v+'</div>'});
+  html+='</div>';
+  container.innerHTML=html;
+}
+
+function openPromotorModal(category,score){
+  const data=PROMOTOR_MODAL_DATA[category]&&PROMOTOR_MODAL_DATA[category][score];
+  if(!data)return;
+  let html='';
+  html+='<div style="margin-bottom:16px">';
+  const badgeColor=data.type==='promotor'?'var(--emerald)':data.type==='detractor'?'var(--red)':'var(--amber)';
+  const badgeText=data.type==='promotor'?'Promotor':data.type==='detractor'?'Detractor':'No Promotor';
+  html+='<span style="display:inline-block;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;background:'+badgeColor+'1a;color:'+badgeColor+';border:1px solid '+badgeColor+'33">'+badgeText+'</span>';
+  html+='</div>';
+  html+='<p style="font-size:14px;color:#e2e8f0;line-height:1.6;margin-bottom:16px">'+data.desc+'</p>';
+  if(data.patterns&&data.patterns.length){
+    html+='<h4>Patrones del promotor presentes</h4>';
+    data.patterns.forEach(pn=>{
+      const p=PROMOTOR_PATTERNS[pn-1];
+      if(!p)return;
+      html+='<div style="background:rgba(30,41,59,.4);border-radius:8px;padding:12px 14px;margin-bottom:8px;border:1px solid rgba(45,212,191,.08);border-left:3px solid var(--emerald)">';
+      html+='<div style="font-weight:600;color:#e2e8f0;font-size:13px;margin-bottom:4px">'+p.num+'. '+p.title+'</div>';
+      html+='<div style="font-size:12px;color:var(--mint);line-height:1.5">'+p.insight+'</div>';
+      html+='</div>';
+    });
+  }
+  if(data.verbatims&&data.verbatims.length){
+    html+='<h4 style="margin-top:16px">Verbatims representativos</h4>';
+    data.verbatims.forEach(v=>{html+='<div class="verbatim" style="border-left-color:'+(data.type==='promotor'?'var(--teal)':'var(--amber)')+'">'+v+'</div>'});
+  }
+  openModal(data.title,html);
+}
+
 // ===== CHARTS =====
 const EMERALD='#10b981',MINT='#2dd4bf',TEAL='#14b8a6',ACCENT='#34d399',DARK='#0f172a',GRAY='#64748b',RED='#ef4444',AMBER='#f59e0b',SLATE='#94a3b8';
 const GRID_COLOR='rgba(100,116,139,.1)';
@@ -1234,13 +1395,35 @@ function initTab1Charts(){
   const expLabels=DATA.expDist.filter(d=>d.v>0).map(d=>'Experiencia '+d.l);
   const expData=DATA.expDist.filter(d=>d.v>0).map(d=>d.p);
   const expVals=DATA.expDist.filter(d=>d.v>0).map(d=>d.v);
-  makeChart('chartExpDist',{type:'bar',data:{labels:expLabels,datasets:[{data:expData,backgroundColor:EMERALD,borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return c.raw+'% ('+expVals[c.dataIndex]+' respuestas)'}}}},scales:{y:{beginAtZero:true,grid:{color:GRID_COLOR},ticks:{color:TEXT_COLOR,callback:function(c){return c+'%'}}},x:{grid:{display:false},ticks:{color:LABEL_COLOR,font:{size:11}}}}}});
+  const expChart=makeChart('chartExpDist',{type:'bar',data:{labels:expLabels,datasets:[{data:expData,backgroundColor:EMERALD,borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return c.raw+'% ('+expVals[c.dataIndex]+' respuestas)'}}}},scales:{y:{beginAtZero:true,grid:{color:GRID_COLOR},ticks:{color:TEXT_COLOR,callback:function(c){return c+'%'}}},x:{grid:{display:false},ticks:{color:LABEL_COLOR,font:{size:11}}}}}});
+  if(expChart){
+    expChart.options.onClick=function(e,elements){
+      if(elements&&elements.length){
+        const idx=elements[0].index;
+        const score=DATA.expDist.filter(d=>d.v>0)[idx].l;
+        openPromotorModal('exp',score);
+      }
+    };
+    expChart.options.onHover=function(e,elements){e.native.target.style.cursor=elements&&elements.length?'pointer':'default'};
+    expChart.update();
+  }
 
   const recLabels=DATA.recDist.filter(d=>d.v>0).map(d=>'Recomendación '+d.l);
   const recData=DATA.recDist.filter(d=>d.v>0).map(d=>d.p);
   const recVals=DATA.recDist.filter(d=>d.v>0).map(d=>d.v);
   const recColors=DATA.recDist.filter(d=>d.v>0).map(d=>d.l==='5'?EMERALD:d.l==='4'?MINT:d.l==='3'?AMBER:RED);
-  makeChart('chartRecDist',{type:'bar',data:{labels:recLabels,datasets:[{data:recData,backgroundColor:recColors,borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return c.raw+'% ('+recVals[c.dataIndex]+' respuestas)'}}}},scales:{y:{beginAtZero:true,grid:{color:GRID_COLOR},ticks:{color:TEXT_COLOR,callback:function(c){return c+'%'}}},x:{grid:{display:false},ticks:{color:LABEL_COLOR}}}}});
+  const recChart=makeChart('chartRecDist',{type:'bar',data:{labels:recLabels,datasets:[{data:recData,backgroundColor:recColors,borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return c.raw+'% ('+recVals[c.dataIndex]+' respuestas)'}}}},scales:{y:{beginAtZero:true,grid:{color:GRID_COLOR},ticks:{color:TEXT_COLOR,callback:function(c){return c+'%'}}},x:{grid:{display:false},ticks:{color:LABEL_COLOR}}}}});
+  if(recChart){
+    recChart.options.onClick=function(e,elements){
+      if(elements&&elements.length){
+        const idx=elements[0].index;
+        const score=DATA.recDist.filter(d=>d.v>0)[idx].l;
+        openPromotorModal('rec',score);
+      }
+    };
+    recChart.options.onHover=function(e,elements){e.native.target.style.cursor=elements&&elements.length?'pointer':'default'};
+    recChart.update();
+  }
 }
 
 // Segment charts
@@ -1319,6 +1502,8 @@ renderHallazgosMatrix('hallazgosAntigBody',['Transversal','\u003C3 meses','3-6 m
 renderHallazgosMatrix('hallazgosTipoBody',['Transversal','Ejecuci\u00F3n','Especialista','Ejec+Esp','Multirol','Gu\u00EDa/Lead'],HALLAZGOS.map(h=>h.tipo_act));
 renderHallazgosMatrix('hallazgosAreaBody',['Transversal','Operaciones','Comercial','BI','IT','Tech Support','Finanzas + Otros'],HALLAZGOS.map(h=>h.area));
 renderAreaContext('OP');
+renderPatrones();
+renderVerbatimsCompare();
 initTab1Charts();
 initSegmentCharts();
 initAnexoCharts();
