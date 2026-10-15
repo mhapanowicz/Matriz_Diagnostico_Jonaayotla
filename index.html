@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard | Diagnóstico de Marca Empleadora GetIn</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+/* ===== RESET & BASE ===== */
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --dark:#090d16;
+  --navy:#0f172a;
+  --card:#1e293b;
+  --emerald:#10b981;
+  --mint:#2dd4bf;
+  --teal:#14b8a6;
+  --accent:#34d399;
+  --success:#059669;
+  --amber:#f59e0b;
+  --red:#ef4444;
+  --gray:#64748b;
+  --font:'Inter',system-ui,sans-serif;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--dark);color:#e2e8f0;overflow-x:hidden;position:relative;min-height:100vh}
+body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background:radial-gradient(ellipse at 20% 0%,rgba(16,185,129,.08) 0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(45,212,191,.06) 0%,transparent 50%),radial-gradient(ellipse at 50% 50%,rgba(20,184,166,.04) 0%,transparent 60%);pointer-events:none;z-index:0}
+body > *{position:relative;z-index:1}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-track{background:var(--dark)}
+::-webkit-scrollbar-thumb{background:rgba(45,212,191,.3);border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:rgba(45,212,191,.5)}
+
+/* ===== HEADER ===== */
+.header{background:linear-gradient(135deg,var(--navy) 0%,var(--dark) 100%);padding:0 24px;height:64px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:100;box-shadow:0 2px 20px rgba(0,0,0,.4);border-bottom:1px solid rgba(45,212,191,.15)}
+.header .logo{display:flex;align-items:center;gap:10px}
+.header .logo-circle{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--mint),var(--emerald));display:flex;align-items:center;justify-content:center;box-shadow:0 0 12px rgba(45,212,191,.3)}
+.header .logo-circle i{color:var(--navy);font-size:18px}
+.header h1{color:#f1f5f9;font-size:18px;font-weight:700;letter-spacing:-.3px}
+.header .subtitle{color:var(--mint);font-size:12px;font-weight:400;margin-left:auto;opacity:.9}
+
+/* ===== TABS NAV ===== */
+.tab-nav{background:rgba(15,23,42,.6);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);padding:0 24px;display:flex;gap:2px;overflow-x:auto;box-shadow:0 1px 4px rgba(0,0,0,.2);position:sticky;top:64px;z-index:99;border-bottom:1px solid rgba(45,212,191,.1)}
+.tab-btn{padding:12px 20px;border:none;background:transparent;color:var(--gray);font-family:var(--font);font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;transition:all .25s ease}
+.tab-btn:hover{color:var(--mint);background:rgba(45,212,191,.05)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--emerald);font-weight:600}
+
+/* ===== TAB CONTENT ===== */
+.tab-content{display:none;padding:24px;animation:fadeIn .4s ease}
+.tab-content.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ===== GLASS PANELS ===== */
+.glass{background:rgba(30,41,59,.6);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(45,212,191,.1);border-radius:12px}
+
+/* ===== KPI CARDS ===== */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.kpi-card{background:linear-gradient(135deg,var(--navy) 0%,var(--dark) 100%);border-radius:12px;padding:24px;text-align:center;box-shadow:0 4px 16px rgba(0,0,0,.3);border:1px solid rgba(45,212,191,.1);border-top:3px solid var(--emerald);transition:transform .2s,box-shadow .2s}
+.kpi-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(16,185,129,.15)}
+.kpi-card .kpi-value{font-size:36px;font-weight:800;color:#f1f5f9;line-height:1.1}
+.kpi-card .kpi-value span{font-size:20px;color:var(--gray);font-weight:500}
+.kpi-card .kpi-label{font-size:13px;color:var(--gray);margin-top:6px;text-transform:uppercase;letter-spacing:.5px}
+.kpi-card .kpi-sub{font-size:11px;color:var(--gray);margin-top:4px;opacity:.7}
+
+/* ===== FINDING CARDS ===== */
+.finding-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px}
+.finding-card{background:rgba(30,41,59,.6);backdrop-filter:blur(12px);border-radius:10px;padding:16px;border:1px solid rgba(255,255,255,.05);border-left:4px solid var(--gray);transition:transform .2s,box-shadow .2s}
+.finding-card:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,.3)}
+.finding-card.green{background:rgba(16,185,129,.1);border-left-color:var(--emerald);border:1px solid rgba(16,185,129,.15);border-left:4px solid var(--emerald)}
+.finding-card.yellow{background:rgba(245,158,11,.08);border-left-color:var(--amber);border:1px solid rgba(245,158,11,.15);border-left:4px solid var(--amber)}
+.finding-card.red{background:rgba(239,68,68,.08);border-left-color:var(--red);border:1px solid rgba(239,68,68,.15);border-left:4px solid var(--red)}
+.finding-card .f-icon{font-size:20px;margin-bottom:8px}
+.finding-card .f-title{font-size:14px;font-weight:600;color:#f1f5f9;margin-bottom:4px}
+.finding-card .f-desc{font-size:12px;color:#94a3b8;line-height:1.5}
+
+/* ===== CHART CONTAINERS ===== */
+.chart-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.chart-box{background:rgba(30,41,59,.6);backdrop-filter:blur(12px);border-radius:10px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.2);border:1px solid rgba(45,212,191,.08)}
+.chart-box h3{font-size:14px;font-weight:600;color:#f1f5f9;margin-bottom:12px}
+.chart-box.full{grid-column:1/-1}
+.chart-canvas-wrap{position:relative;height:260px}
+.chart-canvas-wrap.tall{height:380px}
+.chart-canvas-wrap.radar{height:420px}
+
+/* ===== MATRIX TABLE ===== */
+.matrix-wrap{background:rgba(30,41,59,.6);backdrop-filter:blur(12px);border-radius:10px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.2);border:1px solid rgba(45,212,191,.08);overflow-x:auto}
+.matrix-wrap h3{font-size:15px;font-weight:600;margin-bottom:12px;color:#f1f5f9}
+.matrix-wrap p{font-size:12px;color:var(--gray);margin-bottom:12px}
+.filters-row{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.filter-select{padding:8px 14px;border:1px solid rgba(45,212,191,.2);border-radius:8px;font-family:var(--font);font-size:13px;color:#e2e8f0;background:var(--navy);cursor:pointer}
+.filter-select:focus{outline:none;border-color:var(--emerald);box-shadow:0 0 0 2px rgba(16,185,129,.2)}
+.filter-info{font-size:12px;color:var(--gray);align-self:center}
+table.matrix{width:100%;border-collapse:collapse;font-size:12px;min-width:900px}
+table.matrix th{background:var(--navy);color:#f1f5f9;padding:10px 8px;text-align:center;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.3px;position:sticky;top:0;border-bottom:2px solid rgba(45,212,191,.2)}
+table.matrix th:first-child{text-align:left;min-width:180px}
+table.matrix td{padding:8px 6px;text-align:center;border-bottom:1px solid rgba(100,116,139,.1);transition:background .15s;color:#cbd5e1}
+table.matrix td:first-child{text-align:left;font-weight:500;color:#e2e8f0;cursor:pointer}
+table.matrix td:first-child:hover{color:var(--mint);text-decoration:underline}
+table.matrix tr:hover td{background:rgba(45,212,191,.03)}
+.cell-intense{background:rgba(45,212,191,.35);color:#f1f5f9;font-weight:600}
+.cell-medium{background:rgba(45,212,191,.22);color:#e2e8f0}
+.cell-soft{background:rgba(45,212,191,.12);color:#cbd5e1}
+.cell-low{background:rgba(100,116,139,.05);color:var(--gray)}
+.cell-empty{color:rgba(100,116,139,.4)}
+.cell-bad-intense{background:rgba(239,68,68,.35);color:#f1f5f9;font-weight:600}
+.cell-bad-medium{background:rgba(239,68,68,.22);color:#e2e8f0}
+.cell-bad-soft{background:rgba(239,68,68,.12);color:#fca5a5}
+/* Brecha matrix colors */
+.cell-conv{background:rgba(16,185,129,.15);color:#6ee7b7;border-left:3px solid var(--emerald);font-weight:500}
+.cell-gap{background:rgba(245,158,11,.12);color:#fcd34d;border-left:3px solid var(--amber)}
+.cell-div{background:rgba(239,68,68,.12);color:#fca5a5;border-left:3px solid var(--red)}
+.cell-crit{background:rgba(239,68,68,.15);color:#fca5a5;border-left:3px solid var(--red);font-weight:600}
+.cell-total{background:rgba(100,116,139,.08);color:var(--gray);border-left:3px solid rgba(100,116,139,.3)}
+
+/* ===== SUB-TABS ===== */
+.subtab-nav{display:flex;gap:4px;margin-bottom:16px;border-bottom:2px solid rgba(45,212,191,.1)}
+.subtab-btn{padding:8px 18px;border:none;background:transparent;color:var(--gray);font-family:var(--font);font-size:13px;font-weight:500;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s}
+.subtab-btn:hover{color:var(--mint)}
+.subtab-btn.active{color:var(--accent);border-bottom-color:var(--emerald);font-weight:600}
+.subtab-content{display:none;animation:fadeIn .3s}
+.subtab-content.active{display:block}
+
+/* ===== SEGMENT CARDS ===== */
+.segment-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.segment-table{background:rgba(30,41,59,.6);backdrop-filter:blur(12px);border-radius:10px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.2);border:1px solid rgba(45,212,191,.08);overflow-x:auto}
+.segment-table table{width:100%;border-collapse:collapse;font-size:13px}
+.segment-table th{background:var(--navy);color:#f1f5f9;padding:8px 10px;text-align:left;font-size:11px;text-transform:uppercase;border-bottom:2px solid rgba(45,212,191,.2)}
+.segment-table td{padding:8px 10px;border-bottom:1px solid rgba(100,116,139,.1);color:#cbd5e1}
+.segment-table tr:hover td{background:rgba(45,212,191,.03)}
+.segment-table .crit-row td{background:rgba(239,68,68,.05)}
+.insight-box{background:rgba(30,41,59,.6);backdrop-filter:blur(12px);border-left:4px solid var(--emerald);border-radius:8px;padding:14px 18px;margin:16px 0;font-size:13px;color:#e2e8f0;line-height:1.6;border:1px solid rgba(45,212,191,.1)}
+.insight-box strong{color:var(--accent)}
+.insight-box.expandable{cursor:pointer;user-select:none}
+.insight-box.expandable .expand-content{display:none;margin-top:10px;padding-top:10px;border-top:1px solid rgba(45,212,191,.15)}
+.insight-box.expandable.expanded .expand-content{display:block;animation:fadeIn .3s}
+
+/* ===== ACTION CARDS ===== */
+.action-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.action-card{background:linear-gradient(135deg,var(--navy) 0%,var(--dark) 100%);border-radius:10px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.2);border:1px solid rgba(45,212,191,.08);border-top:4px solid var(--gray)}
+.action-card.high{border-top-color:var(--red);box-shadow:0 2px 12px rgba(239,68,68,.1)}
+.action-card.medium{border-top-color:var(--amber)}
+.action-card .ac-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.action-card .ac-title{font-size:15px;font-weight:600;color:#f1f5f9}
+.action-card .ac-badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;text-transform:uppercase}
+.action-card .ac-badge.high{background:rgba(239,68,68,.15);color:#fca5a5}
+.action-card .ac-badge.medium{background:rgba(245,158,11,.15);color:#fcd34d}
+.action-card .ac-desc{font-size:13px;color:#94a3b8;line-height:1.5;margin-bottom:12px}
+.action-card .ac-actions{list-style:none;margin-bottom:12px}
+.action-card .ac-actions li{display:flex;align-items:flex-start;gap:8px;padding:6px 0;font-size:13px;color:#cbd5e1}
+.action-card .ac-actions input[type=checkbox]{margin-top:3px;accent-color:var(--emerald);cursor:pointer;width:16px;height:16px}
+.action-card .ac-actions label{cursor:pointer;flex:1}
+.action-card .ac-actions input[type=checkbox]:checked+label{text-decoration:line-through;color:var(--gray)}
+.action-card .ac-footer{display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid rgba(100,116,139,.15)}
+.action-card .ac-impact{font-size:12px;color:var(--gray)}
+.action-card .ac-impact span{font-weight:600;color:#e2e8f0}
+.action-card .ac-status{padding:4px 10px;border-radius:6px;font-size:11px;border:1px solid rgba(100,116,139,.2);background:var(--navy);cursor:pointer;font-family:var(--font);color:var(--gray)}
+.action-card .ac-status.pending{color:var(--gray)}
+.action-card .ac-status.progress{color:var(--amber);border-color:var(--amber);background:rgba(245,158,11,.08)}
+.action-card .ac-status.done{color:var(--emerald);border-color:var(--emerald);background:rgba(16,185,129,.08)}
+
+/* ===== ACCORDION ===== */
+.accordion{display:flex;flex-direction:column;gap:8px}
+.acc-item{background:rgba(30,41,59,.6);backdrop-filter:blur(12px);border-radius:10px;box-shadow:0 2px 4px rgba(0,0,0,.15);overflow:hidden;border:1px solid rgba(45,212,191,.08)}
+.acc-header{padding:16px 20px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:600;color:#f1f5f9;transition:background .2s}
+.acc-header:hover{background:rgba(45,212,191,.05)}
+.acc-header .acc-arrow{transition:transform .3s;color:var(--mint)}
+.acc-item.open .acc-header{background:rgba(45,212,191,.05)}
+.acc-item.open .acc-arrow{transform:rotate(90deg)}
+.acc-body{max-height:0;overflow:hidden;transition:max-height .35s ease}
+.acc-item.open .acc-body{max-height:600px}
+.acc-body-inner{padding:16px 20px;font-size:13px;color:#94a3b8;line-height:1.7}
+.acc-body-inner ol{padding-left:20px}
+.acc-body-inner ol li{margin-bottom:8px}
+.acc-body-inner ol li strong{color:#e2e8f0}
+
+/* ===== AREA CARDS (Tab 3) ===== */
+.area-cards-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.area-card{background:linear-gradient(135deg,var(--navy) 0%,var(--dark) 100%);border-radius:14px;padding:0;box-shadow:0 4px 16px rgba(0,0,0,.3);border:1px solid rgba(45,212,191,.1);overflow:hidden;cursor:pointer;transition:transform .2s,box-shadow .2s,border-color .2s}
+.area-card:hover{transform:translateY(-3px);box-shadow:0 8px 32px rgba(16,185,129,.12);border-color:rgba(45,212,191,.3)}
+.area-card-header{padding:18px 20px;border-bottom:1px solid rgba(45,212,191,.08);display:flex;justify-content:space-between;align-items:flex-start}
+.area-card-header h3{font-size:17px;font-weight:700;color:#f1f5f9;margin-bottom:6px}
+.area-card-badges{display:flex;gap:8px;flex-wrap:wrap}
+.area-badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.area-badge.exp{background:rgba(45,212,191,.12);color:var(--mint);border:1px solid rgba(45,212,191,.2)}
+.area-badge.rec{background:rgba(52,211,153,.12);color:var(--accent);border:1px solid rgba(52,211,153,.2)}
+.area-badge.n{background:rgba(100,116,139,.12);color:var(--gray);border:1px solid rgba(100,116,139,.2)}
+.area-badge.crit{background:rgba(239,68,68,.12);color:#fca5a5;border:1px solid rgba(239,68,68,.2)}
+.area-card-body{padding:18px 20px}
+.area-card-section{margin-bottom:14px}
+.area-card-section-title{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.3px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.area-card-section-title.fort{color:var(--emerald)}
+.area-card-section-title.opp{color:var(--amber)}
+.area-card-section-title.coinc{color:var(--mint)}
+.area-card-list{list-style:none;padding:0;margin:0}
+.area-card-list li{font-size:13px;color:#cbd5e1;padding:4px 0;display:flex;align-items:flex-start;gap:8px}
+.area-card-list li .dot-green{width:8px;height:8px;border-radius:50%;background:var(--emerald);box-shadow:0 0 8px rgba(16,185,129,.5);margin-top:6px;flex-shrink:0}
+.area-card-list li .dot-amber{width:8px;height:8px;border-radius:50%;background:var(--amber);box-shadow:0 0 8px rgba(245,158,11,.5);margin-top:6px;flex-shrink:0}
+.area-card-list li .dot-mint{width:8px;height:8px;border-radius:50%;background:var(--mint);box-shadow:0 0 8px rgba(45,212,191,.5);margin-top:6px;flex-shrink:0}
+.area-card-insight{font-size:13px;color:#94a3b8;line-height:1.6;padding:12px;background:rgba(45,212,191,.05);border-radius:8px;border:1px solid rgba(45,212,191,.08);margin-bottom:12px}
+.area-card-verbatims{margin-top:10px}
+.area-card-verbatims .verbatim{font-style:italic;color:#cbd5e1;background:rgba(45,212,191,.05);border-left:3px solid var(--teal);padding:10px 14px;border-radius:6px;margin:6px 0;font-size:12px;line-height:1.5}
+.area-card-footer{padding:12px 20px;border-top:1px solid rgba(45,212,191,.08);text-align:right}
+.area-card-footer span{font-size:12px;color:var(--mint);font-weight:500}
+.area-card-footer i{margin-left:4px;font-size:10px}
+
+/* ===== DOTS ===== */
+.dot-green{width:8px;height:8px;border-radius:50%;background:var(--emerald);box-shadow:0 0 8px rgba(16,185,129,.5);display:inline-block}
+.dot-amber{width:8px;height:8px;border-radius:50%;background:var(--amber);box-shadow:0 0 8px rgba(245,158,11,.5);display:inline-block}
+.dot-red{width:8px;height:8px;border-radius:50%;background:var(--red);box-shadow:0 0 8px rgba(239,68,68,.5);display:inline-block}
+.dot-gray{width:8px;height:8px;border-radius:50%;background:var(--gray);display:inline-block}
+
+/* ===== DONUT WRAP ===== */
+.donut-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+/* ===== SORTABLE TABLE ===== */
+.sort-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:12px}
+.sort-table th{background:var(--navy);color:#f1f5f9;padding:8px;cursor:pointer;text-align:left;font-size:11px;text-transform:uppercase;user-select:none;border-bottom:2px solid rgba(45,212,191,.2)}
+.sort-table th:hover{background:rgba(45,212,191,.05)}
+.sort-table th.sorted-asc::after{content:' ▲'}
+.sort-table th.sorted-desc::after{content:' ▼'}
+.sort-table td{padding:7px 8px;border-bottom:1px solid rgba(100,116,139,.1);color:#cbd5e1}
+.sort-table tr:hover td{background:rgba(45,212,191,.03)}
+
+/* ===== MODAL ===== */
+.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(9,13,22,.7);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity .3s ease}
+.modal-overlay.active{opacity:1;pointer-events:auto}
+.modal{background:linear-gradient(135deg,var(--navy) 0%,var(--dark) 100%);border-radius:14px;padding:0;max-width:700px;max-height:85vh;width:90%;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.5);transform:scale(.9);transition:transform .3s ease;border:1px solid rgba(45,212,191,.2)}
+.modal-overlay.active .modal{transform:scale(1)}
+.modal-header{background:rgba(15,23,42,.8);backdrop-filter:blur(12px);color:#f1f5f9;padding:20px 24px;border-radius:14px 14px 0 0;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;border-bottom:1px solid rgba(45,212,191,.15)}
+.modal-header h2{font-size:18px;font-weight:700}
+.modal-close{background:rgba(45,212,191,.1);border:1px solid rgba(45,212,191,.2);color:#f1f5f9;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:background .2s}
+.modal-close:hover{background:rgba(45,212,191,.2)}
+.modal-body{padding:24px}
+.modal-body h4{font-size:14px;font-weight:600;color:#e2e8f0;margin:16px 0 8px}
+.modal-body p{font-size:13px;color:#94a3b8;line-height:1.6;margin-bottom:10px}
+.modal-body .verbatim{font-style:italic;color:#cbd5e1;background:rgba(45,212,191,.05);border-left:3px solid var(--teal);padding:12px 16px;border-radius:6px;margin:8px 0;font-size:13px;line-height:1.6}
+.modal-body .modal-insight{background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:8px;padding:14px 18px;margin-top:16px}
+.modal-body .modal-insight strong{color:var(--accent);font-size:13px}
+.modal-body .modal-insight p{color:#e2e8f0;font-size:13px;margin:4px 0 0}
+
+/* ===== MISC ===== */
+.badge-emoji{font-size:16px}
+.priority-filter-row{display:flex;gap:12px;margin-bottom:16px;align-items:center}
+.priority-filter-row label{font-size:13px;color:var(--gray)}
+.empty-state{text-align:center;padding:40px;color:var(--gray);font-size:14px}
+@media(max-width:1024px){
+  .kpi-grid{grid-template-columns:repeat(2,1fr)}
+  .finding-grid{grid-template-columns:repeat(2,1fr)}
+  .chart-row,.segment-grid,.donut-grid{grid-template-columns:1fr}
+  .action-grid{grid-template-columns:1fr}
+  .area-cards-grid{grid-template-columns:1fr}
+}
+@media(max-width:640px){
+  .kpi-grid{grid-template-columns:1fr}
+  .finding-grid{grid-template-columns:1fr}
+  .tab-btn{padding:10px 14px;font-size:12px}
+}
+</style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="header">
+  <div class="logo">
+    <div class="logo-circle"><i class="fa-solid fa-bolt"></i></div>
+  </div>
+  <h1>Diagnóstico de Marca Empleadora</h1>
+  <span class="subtitle">Dashboard Interactivo · n=38</span>
+</header>
+
+<!-- ===== TAB NAV ===== -->
+<nav class="tab-nav" id="tabNav">
+  <button class="tab-btn active" data-tab="tab1">Resumen Ejecutivo</button>
+  <button class="tab-btn" data-tab="tab2">Matriz de Hallazgos</button>
+  <button class="tab-btn" data-tab="tab3">Hallazgos por Área</button>
+  <button class="tab-btn" data-tab="tab4">Análisis por Segmentos</button>
+  <button class="tab-btn" data-tab="tab5">Planes de Acción</button>
+  <button class="tab-btn" data-tab="tab6">Fase del Análisis</button>
+  <button class="tab-btn" data-tab="tab7">Anexo de Datos</button>
+</nav>
+
+<!-- ===== TAB 1: RESUMEN EJECUTIVO ===== -->
+<section class="tab-content active" id="tab1">
+  <div class="kpi-grid">
+    <div class="kpi-card"><div class="kpi-value">8.7<span>/10</span></div><div class="kpi-label">Experiencia Promedio</div><div class="kpi-sub">Mediana: 9.0</div></div>
+    <div class="kpi-card"><div class="kpi-value">4.47<span>/5</span></div><div class="kpi-label">Recomendación Promedio</div><div class="kpi-sub">89% recomendaría (4-5)</div></div>
+    <div class="kpi-card"><div class="kpi-value">52</div><div class="kpi-label">eNPS</div><div class="kpi-sub">Promotores 63% · Detractores 11%</div></div>
+    <div class="kpi-card"><div class="kpi-value">38</div><div class="kpi-label">Total Respuestas</div><div class="kpi-sub">5 áreas · 5 rangos de antigüedad</div></div>
+  </div>
+
+  <div class="finding-grid">
+    <div class="finding-card green"><div class="f-icon"><i class="fa-solid fa-circle-check" style="color:var(--emerald)"></i></div><div class="f-title">Fortaleza transversal</div><div class="f-desc">Colaboración entre áreas: 53% la identifica como aspecto que más ayuda a hacer bien su trabajo. Es práctica operativa real y cotidiana.</div></div>
+    <div class="finding-card green"><div class="f-icon"><i class="fa-solid fa-circle-check" style="color:var(--emerald)"></i></div><div class="f-title">Motor motivacional</div><div class="f-desc">Aprendizaje 47% y equipo 42% son los principales motivadores. La combinación de crecimiento y personas sostiene el engagement.</div></div>
+    <div class="finding-card green"><div class="f-icon"><i class="fa-solid fa-circle-check" style="color:var(--emerald)"></i></div><div class="f-title">Diferencial de marca</div><div class="f-desc">Innovación 58% como elemento distintivo. GetIn percibido como más que un contador de personas.</div></div>
+    <div class="finding-card yellow"><div class="f-icon"><i class="fa-solid fa-triangle-exclamation" style="color:var(--amber)"></i></div><div class="f-title">Oportunidad de mejora</div><div class="f-desc">Comunicación 29% como aspecto que necesita mayor consistencia. Comunicación de cambios suma otros 13% adicional.</div></div>
+    <div class="finding-card yellow"><div class="f-icon"><i class="fa-solid fa-triangle-exclamation" style="color:var(--amber)"></i></div><div class="f-title">Señal de atención</div><div class="f-desc">21% no identifica un aspecto específico a mejorar. Puede indicar dificultad para dar feedback negativo o satisfacción general.</div></div>
+    <div class="finding-card red"><div class="f-icon"><i class="fa-solid fa-circle-xmark" style="color:var(--red)"></i></div><div class="f-title">Riesgo crítico</div><div class="f-desc">Colaboradores con 3+ años: experiencia 8.3 y recomendación 3.9. La antigüedad correlaciona negativamente con la satisfacción.</div></div>
+  </div>
+
+  <div class="chart-row">
+    <div class="chart-box"><h3>Distribución de Experiencia (1-10)</h3><div class="chart-canvas-wrap"><canvas id="chartExpDist"></canvas></div></div>
+    <div class="chart-box"><h3>Distribución de Recomendación (1-5)</h3><div class="chart-canvas-wrap"><canvas id="chartRecDist"></canvas></div></div>
+  </div>
+</section>
+
+<!-- ===== TAB 2: MATRIZ DE HALLAZGOS ===== -->
+<section class="tab-content" id="tab2">
+  <div class="subtab-nav">
+    <button class="subtab-btn active" data-subtab="hall-antig">Hallazgos por Antigüedad</button>
+    <button class="subtab-btn" data-subtab="hall-tipo">Hallazgos por Tipo de Actividad</button>
+    <button class="subtab-btn" data-subtab="hall-area">Hallazgos por Área</button>
+    <button class="subtab-btn" data-subtab="hall-context">Contexto por Área</button>
+  </div>
+
+  <!-- Subtab: Hallazgos por Antigüedad -->
+  <div class="subtab-content active" id="hall-antig">
+    <div class="matrix-wrap">
+      <h3>Matriz de Hallazgos por Antigüedad</h3>
+      <p>Intensidad del hallazgo por segmento de antigüedad. Verde = fortaleza · Rojo = área de mejora · — = no significativo</p>
+      <table class="matrix" id="hallazgosAntigTable">
+        <thead>
+          <tr>
+            <th>Hallazgo</th><th>Transversal</th><th>&lt;3 meses</th><th>3-6 meses</th><th>6-12 meses</th><th>1-3 años</th><th>3+ años</th>
+          </tr>
+        </thead>
+        <tbody id="hallazgosAntigBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Subtab: Hallazgos por Tipo de Actividad -->
+  <div class="subtab-content" id="hall-tipo">
+    <div class="matrix-wrap">
+      <h3>Matriz de Hallazgos por Tipo de Actividad</h3>
+      <p>Intensidad del hallazgo por tipo de actividad. Verde = fortaleza · Rojo = área de mejora · — = no significativo</p>
+      <table class="matrix" id="hallazgosTipoTable">
+        <thead>
+          <tr>
+            <th>Hallazgo</th><th>Transversal</th><th>Ejecución</th><th>Especialista</th><th>Ejec+Esp</th><th>Multirol</th><th>Guía/Lead</th>
+          </tr>
+        </thead>
+        <tbody id="hallazgosTipoBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Subtab: Hallazgos por Área -->
+  <div class="subtab-content" id="hall-area">
+    <div class="matrix-wrap">
+      <h3>Matriz de Hallazgos por Área</h3>
+      <p>Intensidad del hallazgo por área. Verde = fortaleza · Rojo = área de mejora · — = no significativo</p>
+      <table class="matrix" id="hallazgosAreaTable">
+        <thead>
+          <tr>
+            <th>Hallazgo</th><th>Transversal</th><th>Operaciones</th><th>Comercial</th><th>BI</th><th>IT</th><th>Tech Support</th><th>Finanzas + Otros</th>
+          </tr>
+        </thead>
+        <tbody id="hallazgosAreaBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Subtab: Contexto por Área -->
+  <div class="subtab-content" id="hall-context">
+    <div class="filters-row">
+      <label style="font-size:13px;color:var(--gray);align-self:center">Seleccionar área:</label>
+      <select class="filter-select" id="areaContextSelector" onchange="renderAreaContext(this.value)">
+        <option value="OP">Operaciones</option>
+        <option value="COM">Comercial</option>
+        <option value="BI">BI</option>
+        <option value="IT">IT</option>
+        <option value="TS">Tech Support</option>
+        <option value="FIN">Finanzas + Otros</option>
+      </select>
+    </div>
+    <div id="areaContextContainer"></div>
+  </div>
+</section>
+
+<!-- ===== TAB 3: HALLAZGOS POR ÁREA (NUEVO) ===== -->
+<section class="tab-content" id="tab3">
+  <div class="insight-box" style="margin-bottom:20px">
+    <strong>Vista por área:</strong> Cada card muestra el perfil del área con fortalezas, oportunidades, coincidencias, insights y verbatims representativos. Haz clic en un card para ver el detalle completo.
+  </div>
+  <div class="area-cards-grid" id="areaCardsGrid"></div>
+</section>
+
+<!-- ===== TAB 4: SEGMENTOS ===== -->
+<section class="tab-content" id="tab4">
+  <div class="subtab-nav">
+    <button class="subtab-btn active" data-subtab="seg-area">Por Área</button>
+    <button class="subtab-btn" data-subtab="seg-antig">Por Antigüedad</button>
+    <button class="subtab-btn" data-subtab="seg-tipo">Por Tipo de Actividad</button>
+  </div>
+
+  <div class="subtab-content active" id="seg-area">
+    <div class="chart-row">
+      <div class="chart-box"><h3>Experiencia por Área</h3><div class="chart-canvas-wrap"><canvas id="chartExpArea"></canvas></div></div>
+      <div class="chart-box"><h3>Recomendación por Área</h3><div class="chart-canvas-wrap"><canvas id="chartRecArea"></canvas></div></div>
+    </div>
+    <div class="segment-table">
+      <table><thead><tr><th>Área</th><th>n</th><th>Exp</th><th>Rec</th></tr></thead><tbody>
+        <tr class="crit-row"><td onclick="openSegmentModal('area','IT')">IT</td><td>6</td><td>8.0</td><td>3.7</td></tr>
+        <tr><td onclick="openSegmentModal('area','Comercial')">Comercial</td><td>8</td><td>8.1</td><td>4.5</td></tr>
+        <tr><td onclick="openSegmentModal('area','Operaciones')">Operaciones</td><td>9</td><td>9.3</td><td>4.9</td></tr>
+        <tr><td onclick="openSegmentModal('area','BI')">BI</td><td>6</td><td>8.7</td><td>4.5</td></tr>
+        <tr><td onclick="openSegmentModal('area','Tech Support')">Tech Support</td><td>5</td><td>9.0</td><td>4.4</td></tr>
+        <tr><td onclick="openSegmentModal('area','Finanzas')">Finanzas</td><td>2</td><td>9.5</td><td>5.0</td></tr>
+        <tr><td onclick="openSegmentModal('area','Otra')">Otra</td><td>2</td><td>8.5</td><td>4.5</td></tr>
+      </tbody></table>
+    </div>
+    <div class="insight-box"><strong>IT es el segmento más crítico:</strong> Experiencia 8.0 y recomendación 3.7, ambas por debajo del promedio. Los verbatims sobre falta de reconocimiento y plan de carrera provienen principalmente de IT. Comercial también muestra experiencia below-average (8.1) pero compensa con recomendación 4.5.</div>
+  </div>
+
+  <div class="subtab-content" id="seg-antig">
+    <div class="chart-row">
+      <div class="chart-box"><h3>Experiencia por Antigüedad</h3><div class="chart-canvas-wrap"><canvas id="chartExpAntig"></canvas></div></div>
+      <div class="chart-box"><h3>Recomendación por Antigüedad</h3><div class="chart-canvas-wrap"><canvas id="chartRecAntig"></canvas></div></div>
+    </div>
+    <div class="segment-table">
+      <table><thead><tr><th>Antigüedad</th><th>n</th><th>Exp</th><th>Rec</th></tr></thead><tbody>
+        <tr class="crit-row"><td onclick="openSegmentModal('antig','Menos de 3 meses')">Menos de 3 meses</td><td>4</td><td>7.8</td><td>4.8</td></tr>
+        <tr><td onclick="openSegmentModal('antig','De 3 a 6 meses')">De 3 a 6 meses</td><td>3</td><td>9.3</td><td>5.0</td></tr>
+        <tr><td onclick="openSegmentModal('antig','De 6 meses a 1 año')">De 6 meses a 1 año</td><td>6</td><td>9.2</td><td>4.8</td></tr>
+        <tr><td onclick="openSegmentModal('antig','De 1 a 3 años')">De 1 a 3 años</td><td>13</td><td>8.9</td><td>4.6</td></tr>
+        <tr class="crit-row"><td onclick="openSegmentModal('antig','Más de 3 años')">Más de 3 años</td><td>12</td><td>8.3</td><td>3.9</td></tr>
+      </tbody></table>
+    </div>
+    <div class="insight-box"><strong>La antigüedad correlaciona negativamente:</strong> El segmento 3+ años tiene la experiencia y recomendación más bajas (8.3 / 3.9). Los recién llegados (&lt;3 meses) también muestran experiencia baja (7.8), sugiriendo un onboarding irregular. El "sweet spot" es 3-12 meses (9.2-9.3 / 4.8-5.0).</div>
+  </div>
+
+  <div class="subtab-content" id="seg-tipo">
+    <div class="chart-row">
+      <div class="chart-box"><h3>Experiencia por Tipo de Actividad</h3><div class="chart-canvas-wrap"><canvas id="chartExpTipo"></canvas></div></div>
+      <div class="chart-box"><h3>Recomendación por Tipo de Actividad</h3><div class="chart-canvas-wrap"><canvas id="chartRecTipo"></canvas></div></div>
+    </div>
+    <div class="segment-table">
+      <table><thead><tr><th>Tipo</th><th>n</th><th>Exp</th><th>Rec</th></tr></thead><tbody>
+        <tr class="crit-row"><td onclick="openSegmentModal('tipo','Ejecución + Especialista')">Ejecución + Especialista</td><td>3</td><td>7.7</td><td>3.7</td></tr>
+        <tr><td onclick="openSegmentModal('tipo','Ejecución')">Ejecución</td><td>20</td><td>8.6</td><td>4.6</td></tr>
+        <tr><td onclick="openSegmentModal('tipo','Especialista')">Especialista</td><td>8</td><td>8.6</td><td>4.4</td></tr>
+        <tr><td onclick="openSegmentModal('tipo','Guía / Lead')">Guía / Lead</td><td>3</td><td>9.3</td><td>4.3</td></tr>
+        <tr><td onclick="openSegmentModal('tipo','Multirol (Ejec+Esp+Lead)')">Multirol (Ejec+Esp+Lead)</td><td>4</td><td>9.5</td><td>4.8</td></tr>
+      </tbody></table>
+    </div>
+    <div class="insight-box"><strong>El multirol es el segmento más satisfecho:</strong> Quienes combinan ejecución, especialista y lead reportan la experiencia más alta (9.5) y recomendación 4.8. La combinación de "Ejecución + Especialista" sin rol de lead es la más baja (7.7 / 3.7), sugiriendo que la carga dual sin autoridad genera frustración.</div>
+  </div>
+</section>
+
+<!-- ===== TAB 5: PLANES DE ACCIÓN ===== -->
+<section class="tab-content" id="tab5">
+  <div class="priority-filter-row">
+    <label>Filtrar por prioridad:</label>
+    <select class="filter-select" id="actionFilterPriority" onchange="filterActions()">
+      <option value="">Todas</option><option value="high">Alta</option><option value="medium">Media</option>
+    </select>
+    <label>Filtrar por estado:</label>
+    <select class="filter-select" id="actionFilterStatus" onchange="filterActions()">
+      <option value="">Todos</option><option value="pending">Pendiente</option><option value="progress">En progreso</option><option value="done">Completado</option>
+    </select>
+  </div>
+  <div class="action-grid" id="actionGrid"></div>
+</section>
+
+<!-- ===== TAB 6: FASE DEL ANÁLISIS ===== -->
+<section class="tab-content" id="tab6">
+  <div class="accordion" id="accordion"></div>
+  <div class="insight-box" style="margin-top:20px">
+    <strong>Insight de cierre:</strong> Estas 26 preguntas, distribuidas en 8 dimensiones, constituyen el marco analítico para profundizar el diagnóstico. Las dimensiones de Brecha interno/externo, Reconocimiento/carrera y Prestaciones son las más urgentes dado que concentran los hallazgos críticos del estudio cuantitativo.
+  </div>
+</section>
+
+<!-- ===== TAB 7: ANEXO DE DATOS ===== -->
+<section class="tab-content" id="tab7">
+  <div class="subtab-nav">
+    <button class="subtab-btn active" data-subtab="anx-freq">Frecuencias</button>
+    <button class="subtab-btn" data-subtab="anx-seg">Métricas por Segmento</button>
+    <button class="subtab-btn" data-subtab="anx-dist">Distribuciones</button>
+  </div>
+
+  <div class="subtab-content active" id="anx-freq">
+    <div class="chart-box" style="margin-bottom:16px"><h3>Radar: Aspectos que Ayudan al Trabajo (P5)</h3><div class="chart-canvas-wrap radar"><canvas id="radarP5"></canvas></div></div>
+    <div class="chart-box" style="margin-bottom:16px"><h3>Radar: Aspectos Valiosos (P12)</h3><div class="chart-canvas-wrap radar"><canvas id="radarP12"></canvas></div></div>
+    <div class="chart-row">
+      <div class="chart-box"><h3>Elementos Distintivos (P15)</h3><div class="chart-canvas-wrap tall"><canvas id="barP15"></canvas></div></div>
+      <div class="chart-box"><h3>Características Culturales (P17)</h3><div class="chart-canvas-wrap tall"><canvas id="barP17"></canvas></div></div>
+    </div>
+    <div class="chart-row">
+      <div class="chart-box"><h3>Aspectos que Necesitan Consistencia (P21)</h3><div class="chart-canvas-wrap tall"><canvas id="barP21"></canvas></div></div>
+      <div class="chart-box"><h3>Motivadores (P10)</h3><div class="chart-canvas-wrap tall"><canvas id="barP10"></canvas></div></div>
+    </div>
+  </div>
+
+  <div class="subtab-content" id="anx-seg">
+    <div class="chart-box" style="margin-bottom:16px"><h3>Experiencia y Recomendación por Área</h3><div class="chart-canvas-wrap"><canvas id="grpArea"></canvas></div></div>
+    <div class="chart-box" style="margin-bottom:16px"><h3>Experiencia y Recomendación por Antigüedad</h3><div class="chart-canvas-wrap"><canvas id="grpAntig"></canvas></div></div>
+    <div class="chart-box" style="margin-bottom:16px"><h3>Experiencia y Recomendación por Tipo de Actividad</h3><div class="chart-canvas-wrap"><canvas id="grpTipo"></canvas></div></div>
+  </div>
+
+  <div class="subtab-content" id="anx-dist">
+    <div class="chart-row">
+      <div class="chart-box"><h3>Distribución de Experiencia (1-10)</h3><div class="chart-canvas-wrap"><canvas id="distExp"></canvas></div></div>
+      <div class="chart-box"><h3>Distribución de Recomendación (1-5) — Donut</h3><div class="chart-canvas-wrap"><canvas id="distRecDonut"></canvas></div></div>
+    </div>
+    <div class="chart-row">
+      <div class="chart-box"><h3>Distribución por Área — Donut</h3><div class="chart-canvas-wrap"><canvas id="distAreaDonut"></canvas></div></div>
+      <div class="chart-box"><h3>Distribución por Antigüedad — Donut</h3><div class="chart-canvas-wrap"><canvas id="distAntigDonut"></canvas></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== MODAL ===== -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <h2 id="modalTitle">Título</h2>
+      <button class="modal-close" onclick="closeModalDirect()">×</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+// ===== DATA =====
+const DATA = {
+  p5:[{n:'La colaboración con otras personas o áreas',v:20,p:53},{n:'La comunicación',v:16,p:42},{n:'La confianza que recibo',v:16,p:42},{n:'El apoyo de mi equipo',v:14,p:37},{n:'El acompañamiento de mi líder',v:12,p:32},{n:'La claridad de mis responsabilidades',v:9,p:24},{n:'El conocimiento y experiencia de las personas',v:8,p:21},{n:'La autonomía para resolver y tomar decisiones',v:5,p:13},{n:'Los retos que enfrento',v:5,p:13},{n:'Los recursos y herramientas',v:4,p:11}],
+  p10:[{n:'Aprender y desarrollar nuevas habilidades',v:18,p:47},{n:'El equipo y las personas con las que trabajo',v:16,p:42},{n:'El impacto de mi trabajo',v:15,p:39},{n:'La confianza que recibo',v:12,p:32},{n:'Los retos que enfrento',v:10,p:26},{n:'El ambiente de trabajo',v:10,p:26},{n:'El tipo de proyectos',v:5,p:13},{n:'La posibilidad de aportar ideas',v:5,p:13},{n:'La autonomía para tomar decisiones',v:5,p:13},{n:'El liderazgo y acompañamiento',v:4,p:11},{n:'El propósito de Getin',v:3,p:8}],
+  p12:[{n:'La flexibilidad',v:17,p:45},{n:'El aprendizaje',v:16,p:42},{n:'La colaboración',v:15,p:39},{n:'Las personas',v:13,p:34},{n:'La posibilidad de aportar ideas',v:12,p:32},{n:'Los retos y proyectos',v:11,p:29},{n:'El ambiente',v:8,p:21},{n:'La autonomía',v:7,p:18},{n:'La cercanía',v:3,p:8},{n:'El propósito',v:3,p:8},{n:'La velocidad para hacer las cosas',v:2,p:5}],
+  p15:[{n:'Innovación',v:22,p:58},{n:'Ambiente de trabajo',v:14,p:37},{n:'Colaboración',v:13,p:34},{n:'Aprendizaje',v:12,p:32},{n:'Cercanía entre las personas',v:11,p:29},{n:'Flexibilidad',v:10,p:26},{n:'Impacto del trabajo',v:9,p:24},{n:'Posibilidad de aportar ideas',v:9,p:24},{n:'Autonomía',v:6,p:16},{n:'Tipo de proyectos',v:3,p:8},{n:'Felicidad!',v:1,p:3}],
+  p17:[{n:'Colaborativa',v:20,p:53},{n:'Abierta a nuevas ideas',v:15,p:39},{n:'Orientada a resultados',v:14,p:37},{n:'Innovadora',v:14,p:37},{n:'Cercana',v:10,p:26},{n:'Flexible',v:9,p:24},{n:'Resolutiva',v:8,p:21},{n:'Retadora',v:8,p:21},{n:'Ágil',v:7,p:18},{n:'Adaptable',v:6,p:16},{n:'Autónoma',v:5,p:13},{n:'Directa',v:2,p:5},{n:'Desordenada',v:1,p:3}],
+  p21:[{n:'Comunicación',v:11,p:29},{n:'Claridad de responsabilidades',v:8,p:21},{n:'Colaboración entre áreas',v:8,p:21},{n:'No identifica un aspecto específico',v:8,p:21},{n:'Organización',v:7,p:18},{n:'Forma de tomar decisiones',v:6,p:16},{n:'Reconocimiento',v:5,p:13},{n:'Comunicación de cambios',v:5,p:13},{n:'Acompañamiento',v:3,p:8},{n:'Salarios',v:1,p:3}],
+  expDist:[{l:'10',v:13,p:34},{l:'9',v:11,p:29},{l:'8',v:10,p:26},{l:'7',v:1,p:3},{l:'6',v:1,p:3},{l:'5',v:0,p:0},{l:'4',v:2,p:5},{l:'3',v:0,p:0},{l:'2',v:0,p:0},{l:'1',v:0,p:0}],
+  recDist:[{l:'5',v:24,p:63},{l:'4',v:10,p:26},{l:'3',v:3,p:8},{l:'2',v:0,p:0},{l:'1',v:1,p:3}],
+  area:[{n:'Operaciones',n_resp:9,exp:9.3,rec:4.9},{n:'Comercial',n_resp:8,exp:8.1,rec:4.5},{n:'BI',n_resp:6,exp:8.7,rec:4.5},{n:'IT',n_resp:6,exp:8.0,rec:3.7},{n:'Tech Support',n_resp:5,exp:9.0,rec:4.4},{n:'Finanzas',n_resp:2,exp:9.5,rec:5.0},{n:'Otra',n_resp:2,exp:8.5,rec:4.5}],
+  antig:[{n:'Menos de 3 meses',n_resp:4,exp:7.8,rec:4.8},{n:'De 3 a 6 meses',n_resp:3,exp:9.3,rec:5.0},{n:'De 6 meses a 1 año',n_resp:6,exp:9.2,rec:4.8},{n:'De 1 a 3 años',n_resp:13,exp:8.9,rec:4.6},{n:'Más de 3 años',n_resp:12,exp:8.3,rec:3.9}],
+  tipo:[{n:'Ejecución',n_resp:20,exp:8.6,rec:4.6},{n:'Especialista',n_resp:8,exp:8.6,rec:4.4},{n:'Ejecución + Especialista',n_resp:3,exp:7.7,rec:3.7},{n:'Multirol (Ejec+Esp+Lead)',n_resp:4,exp:9.5,rec:4.8},{n:'Guía / Lead',n_resp:3,exp:9.3,rec:4.3}]
+};
+
+// ===== MODAL DATA =====
+const MODAL_DATA = {
+  'Colaboración entre áreas':{title:'Colaboración entre áreas',context:'El 53% de los colaboradores identifica la colaboración entre áreas como el aspecto que más les ayuda a hacer bien su trabajo. La colaboración no es un valor aspiracional: es una práctica operativa real y cotidiana.',verbatims:['"Ante una posible cancelación de un cliente, los equipos de techsupport, BI y OPs trabajamos en conjunto para: visitar las tiendas, revisarlas con mayor periodicidad y compartirles un cronograma de cómo avanzábamos con algunos pendientes."','"Durante la migración de infraestructura de Google Cloud Platform a AWS, el equipo técnico de IT se sumó hombro a hombro para resolver las incidencias, sin importar de quién era la responsabilidad."','"OPS pone el cachete para la bofetada, BI apoya corrigiendo los datos en chinga, y TS recalibrando para dar paz a los clientes, es algo constante en la que cada área pone su granito de arena para apoyarse."'],insight:'La colaboración es el activo intangible más valioso de GetIn y debe ser protegido explícitamente en la propuesta de marca empleadora. Es lo que el equipo vive día a día y lo que diferencia a GetIn de empresas más estructuradas.'},
+  'Ambiente humano y cercanía':{title:'Ambiente humano y cercanía',context:'El 34% valora a las personas como aspecto más valioso. La cercanía aparece repetidamente como lo que más les gustaría conservar. El trato humano, la empatía y el compañerismo son recurrentes.',verbatims:['"Es como si Getin te diera la oportunidad de crecer, de aprender sin que te vayan a recriminar por equivocarte, es un ambiente que se siente como que todos vamos de la mano creciendo sobre la marcha."','"Reconocer el trabajo de los demás, no solo somos números en un excel. Somos familias que viven de Getin. Ese toque humano es algo que diferencia a otras empresas."','"Tratar a todos como personas y no como un número."'],insight:'El ambiente humano cercano es el corazón del employer brand de GetIn. Es lo que el equipo percibe como único e irreemplazable.'},
+  'Flexibilidad':{title:'Flexibilidad',context:'La flexibilidad es el aspecto más valorado de la experiencia GetIn. El home office, los horarios flexibles y la confianza para tomar decisiones aparecen como diferenciadores únicos.',verbatims:['"La flexibilidad, en mi caso Getin es el lugar que ha sido flexible pero sin hacer de lado las responsabilidades que mi puesto pueda generar."','"La flexibilidad y confianza que dan con respecto a los días de descanso y HO."'],insight:'La flexibilidad no es un beneficio accesorio: es un factor de retención y atracción.'},
+  'Innovación':{title:'Innovación',context:'El 58% identifica la innovación como elemento distintivo. El 37% describe la cultura como innovadora.',verbatims:['"Innovación, porque como dicen en los speeches Getin es más que un contador de personas. Y se buscan soluciones inteligentes."'],insight:'La innovación percibida puede convertirse en un imán de talento para perfiles que buscan proyectos pioneros.'},
+  'Aprendizaje':{title:'Aprendizaje',context:'El 42% menciona el aprendizaje como aspecto valioso. Aparece como motivador clave especialmente en colaboradores con 6 meses a 3 años.',verbatims:['"Desde que llegué a Getin he mejorado considerablemente en diferentes aspectos... Todo este crecimiento ha sido posible gracias al apoyo, acompañamiento y conocimiento que he recibido de mis compañeros."','"El aprendizaje, depende de ti, si te quieres estancar, te quedas, pero si quieres crecer te dan la oportunidad de hacerlo de muchas formas."'],insight:'El aprendizaje en GetIn es orgánico y vivencial, valioso pero vulnerable. Formalizar rutas de desarrollo sin perder la frescura del aprendizaje cotidiano es el reto.'},
+  'Comunicación':{title:'Comunicación',context:'La comunicación y la comunicación de cambios sumadas representan la principal área de inconsistencia percibida (29% + 13% = 42% combinado).',verbatims:['"La mayoría de las ocasiones muchos colaboradores nos enteramos en vivo de proyectos/decisiones/situaciones que ya se tenían por minoría conocidos tiempo atrás."','"Ya que si no se tiene comunicación de algún cambio el área desconoce qué sucede."','"Casi todos los problemas que tenemos terminan en un tema de mala comunicación entre las personas o áreas."'],insight:'La comunicación de cambios es un punto ciego. Un protocolo de comunicación de cambios fortalecería la confianza y reduciría la incertidumbre.'},
+  'Claridad de responsabilidades':{title:'Claridad de responsabilidades',context:'Aparece en todas las áreas, especialmente en Operaciones e IT. Los verbatims revelan fronteras difusas entre áreas.',verbatims:['"La línea donde termina un área y empieza otra a veces no es tan clara."','"Creo que no todos saben cuáles son sus responsabilidades."','"Una definición difusa de responsabilidades suele provocar que todas las solicitudes y la presión recaigan en una sola persona, sobrecargándola operativamente."'],insight:'La falta de claridad de responsabilidades es el problema estructural más mencionado. Definir roles, matrices RACI y límites de área es una intervención prioritaria.'},
+  'Reconocimiento y plan de carrera':{title:'Reconocimiento y plan de carrera',context:'Los verbatims son contundentes. Un colaborador con más de 3 años en IT califica su experiencia 4/10 y recomendación 1/5.',verbatims:['"No veo un plan de carrera a largo plazo. No hay promociones, capacitaciones, reconocimiento."','"Los salarios son bajos."','"El trabajo que hay detrás muchas veces no es reconocido."'],insight:'El reconocimiento y la proyección de carrera son expectativas insatisfechas que afectan directamente la retención del talento con mayor antigüedad.'},
+  'Confianza':{title:'Confianza',context:'La confianza es un aspecto central que ayuda al trabajo del 42% del equipo. Aparece como motivador (32%) y como aspecto valioso implícito en flexibilidad y autonomía.',verbatims:[],insight:'La confianza es un pilar operativo de GetIn. Es la base sobre la que se construye la autonomía y la flexibilidad.'},
+  'Impacto del trabajo':{title:'Impacto del trabajo',context:'El impacto es el motivador principal para el talento senior (3+ años), por encima de las personas. 39% lo señala como motivador y 24% como elemento distintivo.',verbatims:[],insight:'La motivación se desplaza de las personas al impacto con la antigüedad. La propuesta de valor debe evolucionar para mantener el engagement del talento senior.'}
+};
+
+// ===== TAB SWITCHING =====
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.tab).classList.add('active');
+    setTimeout(()=>{if(typeof Chart!=='undefined')Object.values(Chart.instances).forEach(c=>c.resize())},50);
+  });
+});
+
+// ===== SUBTAB SWITCHING =====
+document.querySelectorAll('.subtab-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const parent=btn.closest('.tab-content');
+    parent.querySelectorAll('.subtab-btn').forEach(b=>b.classList.remove('active'));
+    parent.querySelectorAll('.subtab-content').forEach(c=>c.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.subtab).classList.add('active');
+    setTimeout(()=>{if(typeof Chart!=='undefined')Object.values(Chart.instances).forEach(c=>c.resize())},50);
+  });
+});
+
+// ===== MODAL =====
+function openModal(title,html){
+  document.getElementById('modalTitle').textContent=title;
+  document.getElementById('modalBody').innerHTML=html;
+  document.getElementById('modalOverlay').classList.add('active');
+}
+function closeModal(e){if(e.target.id==='modalOverlay')document.getElementById('modalOverlay').classList.remove('active')}
+function closeModalDirect(){document.getElementById('modalOverlay').classList.remove('active')}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModalDirect()});
+
+function buildModalContent(data){
+  let html='<p>'+data.context+'</p>';
+  if(data.verbatims&&data.verbatims.length){
+    html+='<h4>Verbatims</h4>';
+    data.verbatims.forEach(v=>{html+='<div class="verbatim">'+v+'</div>'});
+  }
+  if(data.insight){
+    html+='<div class="modal-insight"><strong>Insight</strong><p>'+data.insight+'</p></div>';
+  }
+  return html;
+}
+
+function openAttrModal(name){
+  const keys=Object.keys(MODAL_DATA);
+  let found=null;
+  for(let k of keys){
+    if(name.toLowerCase().includes(k.toLowerCase())||k.toLowerCase().includes(name.toLowerCase())){
+      found=MODAL_DATA[k];break;
+    }
+  }
+  if(!found&&BRECHA_MODAL_DATA[name])found=BRECHA_MODAL_DATA[name];
+  if(!found){
+    const dims=findAttributeDimensions(name);
+    let html='<p>Datos disponibles para <strong>'+name+'</strong>:</p>';
+    if(dims.length){
+      html+='<h4>Presencia en dimensiones</h4><ul style="list-style:none;padding:0">';
+      dims.forEach(d=>{html+='<li style="padding:4px 0;border-bottom:1px solid rgba(100,116,139,.1)"><strong>'+d.dim+'</strong>: '+d.val+' ('+d.pct+'%)</li>'});
+      html+='</ul>';
+    }else{
+      html+='<p>No hay datos detallados disponibles para este atributo.</p>';
+    }
+    openModal(name,html);
+    return;
+  }
+  openModal(found.title,buildModalContent(found));
+}
+
+// ===== MASTER MATRIX DATA =====
+const ATTRS=[
+  {name:'Colaboración',dims:{'Ayuda al trabajo':[20,53],'Valioso':[15,39],'Distintivo':[13,34],'Cultural':[20,53]}},
+  {name:'Comunicación',dims:{'Ayuda al trabajo':[16,42],'Inconsistencia':[11,29]}},
+  {name:'Confianza',dims:{'Ayuda al trabajo':[16,42],'Motivador':[12,32]}},
+  {name:'Apoyo del equipo',dims:{'Ayuda al trabajo':[14,37]}},
+  {name:'Acompañamiento del líder',dims:{'Ayuda al trabajo':[12,32],'Motivador':[4,11]}},
+  {name:'Claridad de responsabilidades',dims:{'Ayuda al trabajo':[9,24],'Inconsistencia':[8,21]}},
+  {name:'Conocimiento/experiencia',dims:{'Ayuda al trabajo':[8,21]}},
+  {name:'Autonomía',dims:{'Ayuda al trabajo':[5,13],'Valioso':[7,18],'Distintivo':[6,16],'Cultural':[5,13]}},
+  {name:'Retos',dims:{'Ayuda al trabajo':[5,13],'Motivador':[10,26],'Valioso':[11,29]}},
+  {name:'Recursos/herramientas',dims:{'Ayuda al trabajo':[4,11]}},
+  {name:'Aprendizaje',dims:{'Motivador':[18,47],'Valioso':[16,42],'Distintivo':[12,32]}},
+  {name:'Equipo/personas',dims:{'Motivador':[16,42],'Valioso':[13,34]}},
+  {name:'Impacto del trabajo',dims:{'Motivador':[15,39],'Distintivo':[9,24]}},
+  {name:'Ambiente de trabajo',dims:{'Motivador':[10,26],'Valioso':[8,21],'Distintivo':[14,37]}},
+  {name:'Flexibilidad',dims:{'Valioso':[17,45],'Distintivo':[10,26],'Cultural':[9,24]}},
+  {name:'Posibilidad de aportar ideas',dims:{'Motivador':[5,13],'Valioso':[12,32],'Distintivo':[9,24],'Cultural':[15,39]}},
+  {name:'Cercanía',dims:{'Valioso':[3,8],'Distintivo':[11,29],'Cultural':[10,26]}},
+  {name:'Propósito',dims:{'Motivador':[3,8],'Valioso':[3,8]}},
+  {name:'Innovación',dims:{'Distintivo':[22,58],'Cultural':[14,37]}},
+  {name:'Reconocimiento',dims:{'Inconsistencia':[5,13]}},
+  {name:'Organización',dims:{'Inconsistencia':[7,18]}},
+  {name:'Toma de decisiones',dims:{'Inconsistencia':[6,16]}},
+  {name:'Comunicación de cambios',dims:{'Inconsistencia':[5,13]}},
+  {name:'Prestaciones',dims:{'Inconsistencia':[1,3]}},
+  {name:'Plan de carrera',dims:{}}
+];
+
+const COLS=['Ayuda al trabajo','Motivador','Valioso','Distintivo','Cultural','Inconsistencia','Retención'];
+
+function cellClass(pct,isInconsistency){
+  if(pct===0)return'cell-empty';
+  if(isInconsistency){
+    if(pct>=25)return'cell-bad-intense';
+    if(pct>=15)return'cell-bad-medium';
+    if(pct>=5)return'cell-bad-soft';
+    return'cell-empty';
+  }
+  if(pct>=40)return'cell-intense';
+  if(pct>=25)return'cell-medium';
+  if(pct>=15)return'cell-soft';
+  if(pct>=5)return'cell-low';
+  return'cell-empty';
+}
+
+function renderMatrix(){
+  const tbody=document.getElementById('matrixBody');
+  if(!tbody)return;
+  let html='';
+  ATTRS.forEach(attr=>{
+    html+='<tr>';
+    html+='<td onclick="openAttrModal(\''+attr.name.replace(/'/g,"\\'")+'\')">'+attr.name+'</td>';
+    COLS.forEach(col=>{
+      const d=attr.dims[col];
+      if(d){
+        const cls=cellClass(d[1],col==='Inconsistencia');
+        html+='<td class="'+cls+'">'+d[0]+' ('+d[1]+'%)</td>';
+      }else{
+        html+='<td class="cell-empty">—</td>';
+      }
+    });
+    html+='</tr>';
+  });
+  tbody.innerHTML=html;
+}
+
+// ===== HALLAZGOS DATA =====
+const HALLAZGOS=[
+  {name:'Colaboración entre áreas',tipo:'fortaleza',pct:53,antig:[3,2,3,3,3,3],tipo_act:[3,3,2,1,3,2],area:[3,3,2,3,2,3,2]},
+  {name:'Aprendizaje y desarrollo',tipo:'fortaleza',pct:47,antig:[3,3,3,3,2,2],tipo_act:[3,3,3,1,3,3],area:[3,3,3,3,3,3,2]},
+  {name:'Equipo y personas',tipo:'fortaleza',pct:42,antig:[3,2,3,2,3,2],tipo_act:[3,3,3,1,3,3],area:[3,3,3,3,2,3,2]},
+  {name:'Innovación como diferencial',tipo:'fortaleza',pct:58,antig:[3,2,2,2,3,3],tipo_act:[3,3,3,1,3,3],area:[3,3,3,3,3,3,2]},
+  {name:'Flexibilidad',tipo:'fortaleza',pct:45,antig:[3,2,2,3,3,2],tipo_act:[3,3,3,1,2,3],area:[3,3,2,3,2,2,3]},
+  {name:'Confianza',tipo:'fortaleza',pct:42,antig:[3,2,3,2,2,2],tipo_act:[3,3,3,1,3,2],area:[3,3,2,3,2,2,3]},
+  {name:'Ambiente de trabajo',tipo:'fortaleza',pct:37,antig:[2,2,2,2,2,2],tipo_act:[2,2,2,1,3,2],area:[2,3,2,2,2,2,2]},
+  {name:'Posibilidad de aportar ideas',tipo:'fortaleza',pct:32,antig:[2,1,2,2,2,2],tipo_act:[2,2,2,1,2,2],area:[2,2,2,2,2,2,1]},
+  {name:'Impacto del trabajo',tipo:'fortaleza',pct:39,antig:[2,1,1,2,2,3],tipo_act:[2,2,2,1,2,3],area:[2,2,3,2,2,2,1]},
+  {name:'Cercanía entre personas',tipo:'fortaleza',pct:29,antig:[2,2,2,2,2,1],tipo_act:[2,2,2,0,2,1],area:[2,3,2,2,1,2,2]},
+  {name:'Comunicación',tipo:'mejora',pct:29,antig:[3,2,1,1,2,3],tipo_act:[3,3,2,1,1,3],area:[3,1,2,2,3,2,1]},
+  {name:'Claridad de responsabilidades',tipo:'mejora',pct:21,antig:[2,3,1,1,2,2],tipo_act:[2,2,2,3,1,2],area:[2,1,2,2,3,1,2]},
+  {name:'Comunicación de cambios',tipo:'mejora',pct:13,antig:[2,2,1,1,2,2],tipo_act:[2,2,2,1,1,2],area:[2,1,2,2,3,1,1]},
+  {name:'Reconocimiento',tipo:'mejora',pct:13,antig:[2,1,1,1,1,3],tipo_act:[2,1,1,1,1,2],area:[2,1,1,1,3,1,1]},
+  {name:'Organización',tipo:'mejora',pct:18,antig:[2,1,1,1,2,2],tipo_act:[2,2,1,2,1,2],area:[2,1,1,1,2,1,1]},
+  {name:'Toma de decisiones',tipo:'mejora',pct:16,antig:[2,1,1,1,2,2],tipo_act:[2,2,1,2,1,2],area:[2,1,1,1,2,1,1]},
+  {name:'Plan de carrera',tipo:'mejora',pct:0,antig:[2,0,0,1,1,3],tipo_act:[2,1,1,2,0,2],area:[2,1,1,1,3,1,1]},
+  {name:'Onboarding irregular',tipo:'mejora',pct:0,antig:[2,3,1,0,0,1],tipo_act:[2,2,1,1,1,1],area:[2,1,2,1,2,1,2]}
+];
+
+function hallazgoCellClass(intensity,tipo){
+  if(intensity===0)return'cell-empty';
+  if(tipo==='mejora'){
+    if(intensity===3)return'cell-bad-intense';
+    if(intensity===2)return'cell-bad-medium';
+    if(intensity===1)return'cell-bad-soft';
+    return'cell-empty';
+  }
+  if(intensity===3)return'cell-intense';
+  if(intensity===2)return'cell-medium';
+  if(intensity===1)return'cell-soft';
+  return'cell-low';
+}
+
+function renderHallazgosMatrix(tableId,columnLabels,intensityData){
+  const tbody=document.getElementById(tableId);
+  if(!tbody)return;
+  let html='';
+  HALLAZGOS.forEach((h,idx)=>{
+    const row=intensityData[idx];
+    const typeLabel=h.tipo==='fortaleza'?'<span class="dot-green"></span>':'<span class="dot-red"></span>';
+    html+='<tr>';
+    html+='<td onclick="openAttrModal(\''+h.name.replace(/'/g,"\\'")+'\')" style="font-weight:500">'+typeLabel+' '+h.name+(h.pct>0?' <span style="font-size:10px;color:var(--gray)">('+h.pct+'%)</span>':'')+'</td>';
+    columnLabels.forEach((label,colIdx)=>{
+      const intensity=row[colIdx];
+      const cls=hallazgoCellClass(intensity,h.tipo);
+      const labelMap={0:'—',1:'suave',2:'medio',3:'alto'};
+      html+='<td class="'+cls+'">'+(intensity===0?'—':labelMap[intensity])+'</td>';
+    });
+    html+='</tr>';
+  });
+  tbody.innerHTML=html;
+}
+
+// ===== AREA CONTEXT DATA =====
+const AREA_CONTEXT={
+  'OP':{
+    name:'Operaciones',n:9,exp:9.3,rec:4.9,
+    fortalezas:['Colaboración cross-funcional al 67%','Ambiente de trabajo sólido','Innovación como distintivo 67%','Aprendizaje al 56%'],
+    debilidades:['Organización (11%)','Comunicación de cambios (11%) — bajas pero presentes'],
+    insights:'Operaciones es el área más satisfecha y encarna la cultura colaborativa de GetIn. Es el grupo que más vive los valores diferenciales y representa los embajadores naturales del employer brand. La colaboración cross-funcional es su fortaleza operativa y cultural.',
+    acciones:[
+      {titulo:'Mantener y escalar la cultura colaborativa',desc:'Documentar prácticas de colaboración cross-funcional como modelo para otras áreas',items:['Mapear y documentar 3-5 prácticas clave de colaboración','Crear playbook de colaboración para onboarding','Sesiones trimestrales de showcase colaborativo entre áreas']},
+      {titulo:'Employee advocacy',desc:'Identificar embajadores en Operaciones para programa de employee advocacy',items:['Seleccionar 2-3 embajadores del área','Sesiones mensuales de storytelling','Kit de LinkedIn y templates de contenido']}
+    ]
+  },
+  'COM':{
+    name:'Comercial',n:8,exp:8.1,rec:4.5,
+    fortalezas:['Innovación 63%','Impacto del trabajo 50%','Aprendizaje 50%'],
+    debilidades:['Comunicación 25%','Claridad de responsabilidades 25%','Comunicación de cambios 25%'],
+    insights:'Comercial muestra experiencia below-average pero compensa con recomendación. La presión comercial impacta la experiencia cotidiana. El engagement con el producto y el cliente sostiene la recomendación pese a la frustración operativa.',
+    acciones:[
+      {titulo:'Claridad de responsabilidades',desc:'Definir roles comerciales con matriz RACI',items:['Elaborar RACI por proceso comercial crítico','Taller de alineación de roles del área','Documentar descripciones de puesto actualizadas']},
+      {titulo:'Comunicación de cambios',desc:'Implementar protocolo de comunicación para cambios que afectan al área comercial',items:['Diseñar protocolo con plantillas y responsables','Canal centralizado de anuncios para área comercial','Briefing quincenal de estado comercial']}
+    ]
+  },
+  'BI':{
+    name:'BI',n:6,exp:8.7,rec:4.5,
+    fortalezas:['Colaboración 67%','Aprendizaje 50%','Innovación 67%'],
+    debilidades:['Organización (17%)','Toma de decisiones (17%) — bajas'],
+    insights:'BI está alineado con el promedio organizacional y actúa como puente cross-funcional entre operaciones y tecnología. Su posición intermedia le da una perspectiva equilibrada de la cultura.',
+    acciones:[
+      {titulo:'Mantener rol de puente',desc:'Formalizar el rol de BI como conector entre áreas',items:['Documentar procesos cross-funcionales que involucran a BI','Reconocer formalmente el rol de puente en evaluaciones','Facilitar sesiones inter-área lideradas por BI']},
+      {titulo:'Procesos decisionales',desc:'Documentar y optimizar flujos de decisión que involucran a BI',items:['Mapear decisiones recurrentes y responsables','Reducir capas de aprobación innecesarias','Retrospectivas trimestrales de procesos decisionales']}
+    ]
+  },
+  'IT':{
+    name:'IT',n:6,exp:8.0,rec:3.7,
+    fortalezas:['Innovación 67%','Aprendizaje 50%','Conocimiento/experiencia 33%'],
+    debilidades:['Reconocimiento 33%','Plan de carrera 33%','Comunicación 33%','Comunicación de cambios 33%','Claridad de responsabilidades 33%'],
+    insights:'IT es el segmento más crítico. Baja intensidad en reconocimiento, colaboración media, mayor dolor en plan de carrera y comunicación. Los verbatims sobre falta de reconocimiento y plan de carrera provienen principalmente de IT. Requiere intervención urgente.',
+    acciones:[
+      {titulo:'Plan de carrera para IT',desc:'Diseñar rutas de desarrollo técnico con niveles y criterios objetivos',items:['Definir niveles y criterios de promoción técnica','Mapear trayectorias verticales y horizontales','Comunicar rutas en sesión abierta con el equipo IT']},
+      {titulo:'Reconocimiento formal',desc:'Implementar programa de reconocimiento mensual específico para IT',items:['Reconocimiento mensual público y privado','Presupuesto de capacitación individual anual','Reconocer y amplificar logros técnicos en canales internos']},
+      {titulo:'Encuesta de salida',desc:'Conducir stay interviews con talento clave de IT',items:['Identificar talento clave con 2+ años','Stay interviews trimestrales','Actuar sobre hallazgos en 30 días']},
+      {titulo:'Revisión salarial',desc:'Benchmark salarial IT vs. mercado tech en México',items:['Benchmark con empresas tech/retail competitivas','Auditar compensación total (salario + prestaciones + flexibilidad)','Plan de ajuste si se identifican gaps']}
+    ]
+  },
+  'TS':{
+    name:'Tech Support',n:5,exp:9.0,rec:4.4,
+    fortalezas:['Colaboración 80%','Aprendizaje 60%','Innovación 60%'],
+    debilidades:['Comunicación de cambios (20%) — muy baja'],
+    insights:'Tech Support muestra experiencia alta pero recomendación ligeramente baja. El contacto directo con clientes genera presión única. La colaboración muy alta sostiene el engagement.',
+    acciones:[
+      {titulo:'Gestión de presión de clientes',desc:'Implementar sesiones de descompresión y reconocimiento al trabajo frontline',items:['Sesiones quincenales de descompresión','Reconocimiento público al trabajo frontline','Encuesta de clima específica de TS trimestral']},
+      {titulo:'Employee advocacy',desc:'Capturar historias de Tech Support resolviendo problemas reales',items:['Documentar 3-5 historias de resolución exitosa','Compartir en canales internos y redes','Reconocer a protagonistas en all-hands']}
+    ]
+  },
+  'FIN':{
+    name:'Finanzas + Otros',n:4,exp:9.0,rec:4.75,
+    fortalezas:['Flexibilidad','Confianza','Autonomía'],
+    debilidades:['Claridad de responsabilidades (50% en Otros)'],
+    insights:'Muestra pequeña pero con métricas altas. Estabilidad y autonomía caracterizan a estas áreas. n=4 limita el análisis estadístico pero sugiere que las áreas de soporte con menor exposición operativa mantienen satisfacción elevada.',
+    acciones:[
+      {titulo:'Mantener estabilidad',desc:'Preservar las condiciones que generan satisfacción en áreas de soporte',items:['No introducir cambios innecesarios','Mantener autonomía y flexibilidad','Check-in semestral de clima']},
+      {titulo:'Claridad en roles transversales',desc:'Definir responsabilidades para roles que no encajan en un área específica',items:['Mapear roles transversales y sus responsabilidades','Crear descripciones de puesto claras','Matriz RACI para roles multi-función']}
+    ]
+  }
+};
+
+// ===== AREA CARDS DATA (Tab 3) =====
+const AREA_CARDS={
+  'OP':{
+    name:'Operaciones',n:9,exp:9.3,rec:4.9,
+    fortalezas:['Colaboración cross-funcional al 67%','Ambiente de trabajo sólido','Innovación como distintivo (67%)','Aprendizaje al 56%'],
+    oportunidades:['Organización (11%)','Comunicación de cambios (11%)'],
+    coincidencias:['Colaboración como práctica operativa real','Innovación percibida como diferencial','Embajadores naturales del employer brand'],
+    insight:'Operaciones es el área más satisfecha y encarna la cultura colaborativa de GetIn. Es el grupo que más vive los valores diferenciales y representa los embajadores naturales del employer brand.',
+    verbatims:['"Ante una posible cancelación de un cliente, los equipos de techsupport, BI y OPs trabajamos en conjunto para: visitar las tiendas, revisarlas con mayor periodicidad y compartirles un cronograma de cómo avanzábamos."','"OPS pone el cachete para la bofetada, BI apoya corrigiendo los datos en chinga, y TS recalibrando para dar paz a los clientes."']
+  },
+  'IT':{
+    name:'IT',n:6,exp:8.0,rec:3.7,
+    fortalezas:['Innovación 67%','Aprendizaje 50%','Conocimiento/experiencia 33%'],
+    oportunidades:['Reconocimiento 33%','Plan de carrera 33%','Comunicación 33%','Comunicación de cambios 33%','Claridad de responsabilidades 33%'],
+    coincidencias:['Innovación como diferencial técnico','Dolor transversal en reconocimiento y carrera'],
+    insight:'IT es el segmento más crítico. Los verbatims sobre falta de reconocimiento y plan de carrera provienen principalmente de IT. Requiere intervención urgente: plan de carrera, reconocimiento formal, revisión salarial y stay interviews.',
+    verbatims:['"No veo un plan de carrera a largo plazo. No hay promociones, capacitaciones, reconocimiento."','"El trabajo que hay detrás muchas veces no es reconocido."','"Los salarios son bajos."']
+  },
+  'BI':{
+    name:'BI',n:6,exp:8.7,rec:4.5,
+    fortalezas:['Colaboración 67%','Aprendizaje 50%','Innovación 67%'],
+    oportunidades:['Organización (17%)','Toma de decisiones (17%)'],
+    coincidencias:['Rol de puente cross-funcional','Perspectiva equilibrada de la cultura'],
+    insight:'BI está alineado con el promedio organizacional y actúa como puente cross-funcional entre operaciones y tecnología. Su posición intermedia le da una perspectiva equilibrada de la cultura.',
+    verbatims:['"Durante la migración de infraestructura de Google Cloud Platform a AWS, el equipo técnico de IT se sumó hombro a hombro para resolver las incidencias, sin importar de quién era la responsabilidad."']
+  },
+  'TS':{
+    name:'Tech Support',n:5,exp:9.0,rec:4.4,
+    fortalezas:['Colaboración 80%','Aprendizaje 60%','Innovación 60%'],
+    oportunidades:['Comunicación de cambios (20%)'],
+    coincidencias:['Colaboración como sostén del engagement','Contacto directo con clientes como presión única'],
+    insight:'Tech Support muestra experiencia alta pero recomendación ligeramente baja. El contacto directo con clientes genera presión única. La colaboración muy alta sostiene el engagement.',
+    verbatims:['"Ante una posible cancelación de un cliente, los equipos de techsupport, BI y OPs trabajamos en conjunto."']
+  },
+  'COM':{
+    name:'Comercial',n:8,exp:8.1,rec:4.5,
+    fortalezas:['Innovación 63%','Impacto del trabajo 50%','Aprendizaje 50%'],
+    oportunidades:['Comunicación 25%','Claridad de responsabilidades 25%','Comunicación de cambios 25%'],
+    coincidencias:['Engagement con producto y cliente','Frustración operativa sin impacto en recomendación'],
+    insight:'Comercial muestra experiencia below-average pero compensa con recomendación. La presión comercial impacta la experiencia cotidiana. El engagement con el producto y el cliente sostiene la recomendación pese a la frustración operativa.',
+    verbatims:['"La mayoría de las ocasiones muchos colaboradores nos enteramos en vivo de proyectos/decisiones/situaciones que ya se tenían por minoría conocidos tiempo atrás."']
+  },
+  'FIN':{
+    name:'Finanzas + Otros',n:4,exp:9.0,rec:4.75,
+    fortalezas:['Flexibilidad','Confianza','Autonomía'],
+    oportunidades:['Claridad de responsabilidades (50% en Otros)'],
+    coincidencias:['Estabilidad en áreas de soporte','Autonomía como factor de satisfacción'],
+    insight:'Muestra pequeña pero con métricas altas. Estabilidad y autonomía caracterizan a estas áreas. n=4 limita el análisis estadístico pero sugiere que las áreas de soporte con menor exposición operativa mantienen satisfacción elevada.',
+    verbatims:['"La flexibilidad, en mi caso Getin es el lugar que ha sido flexible pero sin hacer de lado las responsabilidades que mi puesto pueda generar."']
+  }
+};
+
+function renderAreaCards(){
+  const grid=document.getElementById('areaCardsGrid');
+  if(!grid)return;
+  let html='';
+  Object.keys(AREA_CARDS).forEach(key=>{
+    const a=AREA_CARDS[key];
+    const isCrit=a.exp<8.5||a.rec<4.5;
+    html+='<div class="area-card" onclick="openAreaCardModal(\''+key+'\')">';
+    html+='<div class="area-card-header">';
+    html+='<div><h3>'+a.name+'</h3>';
+    html+='<div class="area-card-badges">';
+    html+='<span class="area-badge n"><i class="fa-solid fa-users" style="font-size:9px;margin-right:3px"></i>'+a.n+'</span>';
+    html+='<span class="area-badge exp">Exp '+a.exp+'</span>';
+    html+='<span class="area-badge rec">Rec '+a.rec+'</span>';
+    if(isCrit)html+='<span class="area-badge crit"><i class="fa-solid fa-triangle-exclamation" style="font-size:9px;margin-right:3px"></i>Crítico</span>';
+    html+='</div></div></div>';
+    html+='<div class="area-card-body">';
+    // Fortalezas
+    html+='<div class="area-card-section"><div class="area-card-section-title fort"><i class="fa-solid fa-circle-check"></i> Fortalezas</div><ul class="area-card-list">';
+    a.fortalezas.forEach(f=>{html+='<li><span class="dot-green"></span>'+f+'</li>'});
+    html+='</ul></div>';
+    // Oportunidades
+    html+='<div class="area-card-section"><div class="area-card-section-title opp"><i class="fa-solid fa-triangle-exclamation"></i> Oportunidades</div><ul class="area-card-list">';
+    a.oportunidades.forEach(o=>{html+='<li><span class="dot-amber"></span>'+o+'</li>'});
+    html+='</ul></div>';
+    // Coincidencias
+    html+='<div class="area-card-section"><div class="area-card-section-title coinc"><i class="fa-solid fa-circle-dot"></i> Coincidencias</div><ul class="area-card-list">';
+    a.coincidencias.forEach(c=>{html+='<li><span class="dot-mint"></span>'+c+'</li>'});
+    html+='</ul></div>';
+    // Insight
+    html+='<div class="area-card-insight">'+a.insight+'</div>';
+    // Verbatims
+    if(a.verbatims&&a.verbatims.length){
+      html+='<div class="area-card-verbatims">';
+      html+='<div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.3px;color:var(--mint);margin-bottom:6px"><i class="fa-solid fa-quote-left"></i> Verbatims representativos</div>';
+      a.verbatims.forEach(v=>{html+='<div class="verbatim">'+v+'</div>'});
+      html+='</div>';
+    }
+    html+='</div>';
+    html+='<div class="area-card-footer"><span>Ver detalle completo <i class="fa-solid fa-arrow-right"></i></span></div>';
+    html+='</div>';
+  });
+  grid.innerHTML=html;
+}
+
+function openAreaCardModal(key){
+  const a=AREA_CARDS[key];
+  const ctx=AREA_CONTEXT[key];
+  if(!a)return;
+  let html='';
+  // KPIs
+  html+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px">';
+  html+='<div style="text-align:center;background:rgba(45,212,191,.05);padding:14px;border-radius:8px;border:1px solid rgba(45,212,191,.1)"><div style="font-size:28px;font-weight:800;color:#f1f5f9">'+a.n+'</div><div style="font-size:11px;color:var(--gray)">Colaboradores</div></div>';
+  html+='<div style="text-align:center;background:rgba(45,212,191,.05);padding:14px;border-radius:8px;border:1px solid rgba(45,212,191,.1)"><div style="font-size:28px;font-weight:800;color:#f1f5f9">'+a.exp+'<span style="font-size:16px;color:var(--gray)">/10</span></div><div style="font-size:11px;color:var(--gray)">Experiencia</div></div>';
+  html+='<div style="text-align:center;background:rgba(45,212,191,.05);padding:14px;border-radius:8px;border:1px solid rgba(45,212,191,.1)"><div style="font-size:28px;font-weight:800;color:#f1f5f9">'+a.rec+'<span style="font-size:16px;color:var(--gray)">/5</span></div><div style="font-size:11px;color:var(--gray)">Recomendación</div></div>';
+  html+='</div>';
+  // Fortalezas
+  html+='<h4><i class="fa-solid fa-circle-check" style="color:var(--emerald)"></i> Fortalezas</h4><ul style="list-style:none;padding:0;margin-bottom:12px">';
+  a.fortalezas.forEach(f=>{html+='<li style="padding:4px 0;color:#cbd5e1;font-size:13px"><span class="dot-green" style="margin-right:8px"></span>'+f+'</li>'});
+  html+='</ul>';
+  // Oportunidades
+  html+='<h4><i class="fa-solid fa-triangle-exclamation" style="color:var(--amber)"></i> Oportunidades</h4><ul style="list-style:none;padding:0;margin-bottom:12px">';
+  a.oportunidades.forEach(o=>{html+='<li style="padding:4px 0;color:#cbd5e1;font-size:13px"><span class="dot-amber" style="margin-right:8px"></span>'+o+'</li>'});
+  html+='</ul>';
+  // Coincidencias
+  html+='<h4><i class="fa-solid fa-circle-dot" style="color:var(--mint)"></i> Coincidencias</h4><ul style="list-style:none;padding:0;margin-bottom:12px">';
+  a.coincidencias.forEach(c=>{html+='<li style="padding:4px 0;color:#cbd5e1;font-size:13px"><span class="dot-mint" style="margin-right:8px"></span>'+c+'</li>'});
+  html+='</ul>';
+  // Insight
+  html+='<div class="modal-insight"><strong>Insight del área</strong><p>'+a.insight+'</p></div>';
+  // Verbatims
+  if(a.verbatims&&a.verbatims.length){
+    html+='<h4>Verbatims representativos</h4>';
+    a.verbatims.forEach(v=>{html+='<div class="verbatim">'+v+'</div>'});
+  }
+  // Planes de acción
+  if(ctx&&ctx.acciones&&ctx.acciones.length){
+    html+='<h4 style="margin-top:16px"><i class="fa-solid fa-list-check" style="color:var(--accent)"></i> Planes de acción</h4>';
+    ctx.acciones.forEach((ac,ai)=>{
+      const actId='card_'+key+'_'+ai;
+      html+='<div style="background:rgba(30,41,59,.4);border-radius:8px;padding:14px;margin-bottom:10px;border:1px solid rgba(45,212,191,.08)">';
+      html+='<div style="font-weight:600;color:#e2e8f0;font-size:14px;margin-bottom:4px">'+ac.titulo+'</div>';
+      html+='<div style="font-size:12px;color:var(--gray);margin-bottom:8px">'+ac.desc+'</div>';
+      html+='<ul style="list-style:none;padding:0">';
+      ac.items.forEach((item,j)=>{
+        const cbId=actId+'_'+j;
+        const checked=localStorage.getItem(cbId)==='true'?'checked':'';
+        html+='<li style="display:flex;align-items:flex-start;gap:8px;padding:4px 0;font-size:13px;color:#cbd5e1"><input type="checkbox" id="'+cbId+'" '+checked+' onchange="localStorage.setItem(\''+cbId+'\',this.checked)" style="margin-top:3px;accent-color:var(--emerald);cursor:pointer"><label for="'+cbId+'" style="cursor:pointer">'+item+'</label></li>';
+      });
+      html+='</ul></div>';
+    });
+  }
+  openModal(a.name+' — Análisis Detallado',html);
+}
+
+function renderAreaContext(areaKey){
+  const ctx=AREA_CONTEXT[areaKey];
+  if(!ctx)return;
+  const container=document.getElementById('areaContextContainer');
+  let html='';
+  // KPIs
+  html+='<div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px">';
+  html+='<div class="kpi-card"><div class="kpi-value">'+ctx.n+'</div><div class="kpi-label">Colaboradores</div></div>';
+  html+='<div class="kpi-card"><div class="kpi-value">'+ctx.exp+'<span>/10</span></div><div class="kpi-label">Experiencia</div></div>';
+  html+='<div class="kpi-card"><div class="kpi-value">'+ctx.rec+'<span>/5</span></div><div class="kpi-label">Recomendación</div></div>';
+  html+='</div>';
+  // Fortalezas y debilidades
+  html+='<div class="finding-grid" style="grid-template-columns:1fr 1fr;margin-bottom:16px">';
+  html+='<div class="finding-card green"><div class="f-icon"><i class="fa-solid fa-circle-check" style="color:var(--emerald)"></i></div><div class="f-title">Principales fortalezas</div><ul style="list-style:none;padding:0;margin:0">';
+  ctx.fortalezas.forEach(f=>{html+='<li style="font-size:13px;padding:4px 0;color:#cbd5e1">✓ '+f+'</li>'});
+  html+='</ul></div>';
+  html+='<div class="finding-card red"><div class="f-icon"><i class="fa-solid fa-circle-xmark" style="color:var(--red)"></i></div><div class="f-title">Principales debilidades</div><ul style="list-style:none;padding:0;margin:0">';
+  ctx.debilidades.forEach(d=>{html+='<li style="font-size:13px;padding:4px 0;color:#cbd5e1">⚠ '+d+'</li>'});
+  html+='</ul></div></div>';
+  // Insights
+  html+='<div class="insight-box"><strong>Insights clave — '+ctx.name+'</strong> '+ctx.insights+'</div>';
+  // Acciones
+  html+='<h3 style="font-size:15px;font-weight:600;margin:20px 0 12px;color:#f1f5f9">Planes de acción relevantes</h3>';
+  html+='<div class="action-grid">';
+  ctx.acciones.forEach((a,i)=>{
+    const actId='ctx_'+areaKey+'_'+i;
+    html+='<div class="action-card medium">';
+    html+='<div class="ac-header"><div class="ac-title">'+a.titulo+'</div><div class="ac-badge medium">Acción</div></div>';
+    html+='<div class="ac-desc">'+a.desc+'</div>';
+    html+='<ul class="ac-actions">';
+    a.items.forEach((item,j)=>{
+      const cbId=actId+'_'+j;
+      const checked=localStorage.getItem(cbId)==='true'?'checked':'';
+      html+='<li><input type="checkbox" id="'+cbId+'" '+checked+' onchange="localStorage.setItem(\''+cbId+'\',this.checked)"><label for="'+cbId+'">'+item+'</label></li>';
+    });
+    html+='</ul></div>';
+  });
+  html+='</div>';
+  container.innerHTML=html;
+}
+
+function findAttributeDimensions(name){
+  const attr=ATTRS.find(a=>a.name===name);
+  if(!attr)return[];
+  return Object.entries(attr.dims).map(([k,v])=>({dim:k,val:v[0],pct:v[1]}));
+}
+
+// ===== BRECHA MATRIX =====
+const BRECHA=[
+  {attr:'Innovación',interna:'58%',externa:'Muy visible LinkedIn + Glassdoor',estado:'<span class="dot-green"></span> Convergencia',accion:'Comunicar ahora',cls:'cell-conv'},
+  {attr:'Aprendizaje',interna:'42%',externa:'Aparece en Glassdoor e Indeed',estado:'<span class="dot-green"></span> Convergencia',accion:'Comunicar ahora',cls:'cell-conv'},
+  {attr:'Flexibilidad',interna:'45%',externa:'Mencionado en Glassdoor',estado:'<span class="dot-green"></span> Convergencia parcial',accion:'Reforzar narrativa',cls:'cell-conv'},
+  {attr:'Posibilidad de aportar ideas',interna:'32%',externa:'Aparece en Glassdoor',estado:'<span class="dot-green"></span> Convergencia parcial',accion:'Reforzar narrativa',cls:'cell-conv'},
+  {attr:'Las personas como valor',interna:'34%',externa:'Inexistente',estado:'<span class="dot-red"></span> Vacío crítico',accion:'Hacer visible',cls:'cell-crit'},
+  {attr:'Cercanía entre personas',interna:'29%',externa:'Inexistente',estado:'<span class="dot-red"></span> Vacío crítico',accion:'Hacer visible',cls:'cell-crit'},
+  {attr:'Confianza',interna:'42%',externa:'Inexistente',estado:'<span class="dot-red"></span> Vacío crítico',accion:'Hacer visible',cls:'cell-crit'},
+  {attr:'Colaboración entre áreas',interna:'53%',externa:'Solo corporativa',estado:'<span class="dot-amber"></span> Brecha narrativa',accion:'Pasar de empresa a personas',cls:'cell-gap'},
+  {attr:'Ambiente de trabajo',interna:'37%',externa:'Buena calificación sin narrativa',estado:'<span class="dot-amber"></span> Brecha narrativa',accion:'Storytelling',cls:'cell-gap'},
+  {attr:'Impacto del trabajo',interna:'24%',externa:'Solo corporativa',estado:'<span class="dot-amber"></span> Brecha narrativa',accion:'Experiencia personal',cls:'cell-gap'},
+  {attr:'Prestaciones',interna:'3% menciona inconsistencia',externa:'Info contradictoria Indeed',estado:'<span class="dot-amber"></span> Divergencia',accion:'Investigar y alinear',cls:'cell-div'},
+  {attr:'Reconocimiento',interna:'13% dolor',externa:'No visible',estado:'<span class="dot-amber"></span> Divergencia',accion:'Resolver antes de comunicar',cls:'cell-div'},
+  {attr:'Plan de carrera',interna:'Vacío (dolor en verbatims)',externa:'Poco visible',estado:'<span class="dot-red"></span> Vacío total',accion:'Diseñar producto primero',cls:'cell-total'},
+  {attr:'Capacitación',interna:'No medido',externa:'Poco visible',estado:'<span class="dot-red"></span> Vacío',accion:'Explorar',cls:'cell-total'},
+  {attr:'Historias de empleados',interna:'N/A',externa:'Pocas',estado:'<span class="dot-red"></span> Vacío',accion:'Activar employee advocacy',cls:'cell-total'}
+];
+
+const BRECHA_MODAL_DATA={
+  'Innovación':{title:'Innovación — Convergencia Fuerte',context:'58% interno lo identifica como distintivo. Externamente es muy visible en LinkedIn y Glassdoor. Es el atributo con mayor alineación interno/externo.',verbatims:['"Innovación, porque como dicen en los speeches Getin es más que un contador de personas. Y se buscan soluciones inteligentes."'],insight:'La innovación percibida puede convertirse en un imán de talento para perfiles que buscan proyectos pioneros. Comunicar ahora con evidencia concreta.'},
+  'Aprendizaje':{title:'Aprendizaje — Convergencia Fuerte',context:'42% interno lo valora. Externamente aparece en Glassdoor e Indeed. Convergencia fuerte lista para escalar.',verbatims:['"Desde que llegué a Getin he mejorado considerablemente en diferentes aspectos..."','"El aprendizaje, depende de ti, si te quieres estancar, te quedas, pero si quieres crecer te dan la oportunidad de hacerlo de muchas formas."'],insight:'El aprendizaje orgánico es un activo comunicable. Formalizar rutas de desarrollo sin perder la frescura del aprendizaje cotidiano es el reto.'},
+  'Flexibilidad':{title:'Flexibilidad — Convergencia Parcial',context:'45% interno la valora. Externamente se menciona en Glassdoor pero sin narrativa estructurada. La convergencia es parcial: existe pero necesita reforzamiento.',verbatims:['"La flexibilidad, en mi caso Getin es el lugar que ha sido flexible pero sin hacer de lado las responsabilidades que mi puesto pueda generar."'],insight:'La flexibilidad no es un beneficio accesorio: es un factor de retención y atracción. Reforzar la narrativa con casos concretos.'},
+  'Posibilidad de aportar ideas':{title:'Posibilidad de aportar ideas — Convergencia Parcial',context:'32% interno la valora. Aparece en Glassdoor. La apertura a ideas es real pero necesita mayor visibilidad y estructuración.',verbatims:[],insight:'La apertura a ideas es un diferenciador cultural que debe comunicarse con ejemplos concretos de ideas implementadas.'},
+  'Las personas como valor':{title:'Las personas como valor — Vacío Crítico',context:'34% interno valora a las personas como aspecto más valioso. Externamente es inexistente. El corazón del employer brand no tiene huella digital.',verbatims:['"Reconocer el trabajo de los demás, no solo somos números en un excel. Somos familias que viven de Getin."','"Tratar a todos como personas y no como un número."'],insight:'El atributo más valioso es el más invisible. Employee advocacy y storytelling espontáneo son la palanca para hacerlo visible.'},
+  'Cercanía entre personas':{title:'Cercanía entre personas — Vacío Crítico',context:'29% interno la identifica como distintivo. Externamente inexistente. Es lo que más quieren conservar y lo que menos se ve afuera.',verbatims:[],insight:'La cercanía es el atributo que más quieren conservar pero es invisible externamente. Contenido auténtico del equipo es la forma de hacerlo visible.'},
+  'Confianza':{title:'Confianza — Vacío Crítico',context:'42% interno la identifica como aspecto que ayuda al trabajo. Externamente inexistente. La confianza es un pilar operativo invisible.',verbatims:[],insight:'La confianza es la base sobre la que se construye la autonomía y la flexibilidad. Sin visibilidad externa, el mercado no conoce este diferenciador.'},
+  'Colaboración entre áreas':{title:'Colaboración entre áreas — Brecha Narrativa',context:'53% interno. Externamente solo aparece como contenido corporativo, no como experiencia vivida. La fortaleza #1 no tiene narrativa humana.',verbatims:['"Ante una posible cancelación de un cliente, los equipos de techsupport, BI y OPs trabajamos en conjunto..."','"Durante la migración de infraestructura de Google Cloud Platform a AWS, el equipo técnico de IT se sumó hombro a hombro..."'],insight:'Pasar de la colaboración corporativa a la colaboración humana. Historias reales de equipos trabajando juntos son el contenido más auténtico.'},
+  'Ambiente de trabajo':{title:'Ambiente de trabajo — Brecha Narrativa',context:'37% interno lo identifica como distintivo. Externamente hay buena calificación pero sin narrativa que la respalde.',verbatims:[],insight:'La buena calificación externa necesita ser respaldada con narrativa interna. Storytelling del ambiente cotidiano.'},
+  'Impacto del trabajo':{title:'Impacto del trabajo — Brecha Narrativa',context:'24% interno como distintivo, 39% como motivador. Externamente solo aparece en comunicación corporativa, no como experiencia personal.',verbatims:[],insight:'El impacto es el motivador principal del talento senior. Necesita comunicarse como experiencia personal, no como claim corporativo.'},
+  'Prestaciones':{title:'Prestaciones — Divergencia',context:'3% interno menciona inconsistencia. Externamente hay info contradictoria en Indeed ("solo los de ley"). El mercado percibe debilidad donde internamente no es un dolor prioritario.',verbatims:[],insight:'La divergencia es peligrosa: el mercado percibe debilidad antes que el equipo interno. Investigar y alinear la narrativa antes de comunicar.'},
+  'Reconocimiento':{title:'Reconocimiento — Divergencia',context:'13% interno expresa dolor con verbatims contundentes. Externamente no es visible. El dolor interno es invisible afuera.',verbatims:['"No veo un plan de carrera a largo plazo. No hay promociones, capacitaciones, reconocimiento."','"El trabajo que hay detrás muchas veces no es reconocido."'],insight:'Resolver el problema interno antes de comunicar. No se puede proyectar un reconocimiento que el equipo no vive.'},
+  'Plan de carrera':{title:'Plan de carrera — Vacío Total',context:'Vacío interno (dolor expresado en verbatims). Poco visible externamente. Es un problema de producto, no de comunicación.',verbatims:['"No veo un plan de carrera a largo plazo. No hay promociones, capacitaciones, reconocimiento."'],insight:'No se puede comunicar lo que no existe. Diseñar el producto (rutas de carrera) antes de cualquier comunicación externa.'},
+  'Capacitación':{title:'Capacitación — Vacío',context:'No medido internamente. Poco visible externamente. Oportunidad de explorar como atributo de employer brand.',verbatims:[],insight:'Explorar si la capacitación formal es una expectativa del equipo. El aprendizaje orgánico existe, pero la capacitación estructurada podría ser un gap.'},
+  'Historias de empleados':{title:'Historias de empleados — Vacío',context:'No hay datos internos. Externamente hay pocas historias de empleados visibles. El employee advocacy está inactivo.',verbatims:[],insight:'Activar employee advocacy con el grupo 1-3 años como embajadores naturales. Es la palanca de menor costo y mayor autenticidad.'}
+};
+
+function renderBrecha(){
+  const tbody=document.getElementById('brechaBody');
+  if(!tbody)return;
+  let html='';
+  BRECHA.forEach(b=>{
+    html+='<tr onclick="openBrechaModal(\''+b.attr.replace(/'/g,"\\'")+'\')" style="cursor:pointer">';
+    html+='<td style="text-align:left;font-weight:500;color:#e2e8f0">'+b.attr+'</td>';
+    html+='<td style="color:#cbd5e1">'+b.interna+'</td>';
+    html+='<td style="color:#cbd5e1">'+b.externa+'</td>';
+    html+='<td class="'+b.cls+'">'+b.estado+'</td>';
+    html+='<td style="color:#cbd5e1">'+b.accion+'</td>';
+    html+='</tr>';
+  });
+  tbody.innerHTML=html;
+}
+
+function openBrechaModal(attr){
+  const data=BRECHA_MODAL_DATA[attr];
+  if(!data){openModal(attr,'<p>No hay datos detallados disponibles.</p>');return}
+  openModal(data.title,buildModalContent(data));
+}
+
+// ===== SEGMENT MODALS =====
+function openSegmentModal(type,seg){
+  let data=null;
+  if(type==='area')data=DATA.area.find(a=>a.n===seg);
+  else if(type==='antig')data=DATA.antig.find(a=>a.n===seg);
+  else if(type==='tipo')data=DATA.tipo.find(a=>a.n===seg);
+  if(!data)return;
+  const isCrit=data.exp<8.5||data.rec<4.5;
+  let html='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px">';
+  html+='<div style="text-align:center;background:rgba(45,212,191,.05);padding:14px;border-radius:8px;border:1px solid rgba(45,212,191,.1)"><div style="font-size:24px;font-weight:800;color:#f1f5f9">'+data.n_resp+'</div><div style="font-size:11px;color:var(--gray)">Respuestas</div></div>';
+  html+='<div style="text-align:center;background:'+(data.exp<8.5?'rgba(239,68,68,.08)':'rgba(16,185,129,.08)')+';padding:14px;border-radius:8px;border:1px solid '+(data.exp<8.5?'rgba(239,68,68,.15)':'rgba(16,185,129,.15)')+'"><div style="font-size:24px;font-weight:800;color:'+(data.exp<8.5?'#fca5a5':'#6ee7b7')+'">'+data.exp+'</div><div style="font-size:11px;color:var(--gray)">Experiencia</div></div>';
+  html+='<div style="text-align:center;background:'+(data.rec<4.5?'rgba(239,68,68,.08)':'rgba(16,185,129,.08)')+';padding:14px;border-radius:8px;border:1px solid '+(data.rec<4.5?'rgba(239,68,68,.15)':'rgba(16,185,129,.15)')+'"><div style="font-size:24px;font-weight:800;color:'+(data.rec<4.5?'#fca5a5':'#6ee7b7')+'">'+data.rec+'</div><div style="font-size:11px;color:var(--gray)">Recomendación</div></div>';
+  html+='</div>';
+  if(isCrit){
+    html+='<div class="modal-insight" style="margin-top:0;margin-bottom:16px"><strong><i class="fa-solid fa-triangle-exclamation"></i> Segmento crítico</strong><p>Este segmento presenta métricas por debajo del promedio organizacional (Exp 8.7 / Rec 4.47). Requiere atención prioritaria.</p></div>';
+  }
+  const insights={
+    'area':{
+      'IT':'IT es el segmento con menor experiencia (8.0) y recomendación (3.7). Los verbatims sobre falta de reconocimiento y plan de carrera provienen principalmente de IT. Es urgente una intervención específica: encuesta de salida, revisión salarial, y plan de desarrollo.',
+      'Comercial':'Comercial muestra experiencia below-average (8.1) pero compensa con recomendación 4.5. La presión comercial puede estar afectando la experiencia sin impactar la recomendación, sugiriendo engagement con el producto pero frustración operativa.',
+      'Operaciones':'Operaciones es el segmento más satisfecho (9.3 / 4.9). Es el grupo que más encarna la cultura colaborativa. Son los embajadores naturales del employer brand.',
+      'BI':'BI está alineado con el promedio (8.7 / 4.5). Como puente entre operaciones y tecnología, su experiencia refleja la fortaleza de la colaboración cross-funcional.',
+      'Tech Support':'Tech Support muestra experiencia alta (9.0) pero recomendación ligeramente below (4.4). El contacto directo con clientes puede generar presión que no afecta la experiencia pero sí la disposición a recomendar.',
+      'Finanzas':'Finanzas tiene la experiencia más alta (9.5) y recomendación perfecta (5.0), pero n=2. No es estadísticamente significativo pero sugiere estabilidad en áreas de soporte.',
+      'Otra':'n=2, no significativo para análisis individual.'
+    },
+    'antig':{
+      'Menos de 3 meses':'Experiencia 7.8 es la más baja, pero recomendación 4.8 es alta. El onboarding puede ser irregular (exp baja) pero la ilusión inicial mantiene la recomendación. Estabilizar el onboarding es clave.',
+      'De 3 a 6 meses':'El "sweet spot": 9.3 / 5.0. El colaborador ya conoce al equipo pero aún no ha enfrentado frustraciones estructurales. Este es el momento ideal para capturar testimonios.',
+      'De 6 meses a 1 año':'9.2 / 4.8. Mantiene el nivel alto. El aprendizaje orgánico está en su punto máximo.',
+      'De 1 a 3 años':'8.9 / 4.6. Inicia el declive gradual. Es el grupo más numeroso (n=13) y el que mejor representa la experiencia promedio. Son los embajadores ideales para employee advocacy.',
+      'Más de 3 años':'8.3 / 3.9. El segmento más crítico. La motivación se desplaza de personas a impacto, pero el impacto no se comunica. El dolor por reconocimiento y plan de carrera se acumula. Intervención urgente.'
+    },
+    'tipo':{
+      'Ejecución':'8.6 / 4.6. Es el grupo más grande (n=20) y está alineado con el promedio. La experiencia de ejecución es sólida.',
+      'Especialista':'8.6 / 4.4. Experiencia alineada pero recomendación ligeramente baja. La especialización puede generar aislamiento.',
+      'Ejecución + Especialista':'7.7 / 3.7. El segmento más crítico por tipo. La carga dual sin autoridad genera frustración. Revisar roles y responsabilidades.',
+      'Multirol (Ejec+Esp+Lead)':'9.5 / 4.8. El más satisfecho. La variedad de roles genera engagement. Es un modelo a replicar.',
+      'Guía / Lead':'9.3 / 4.3. Experiencia muy alta pero recomendación baja. Los leads valoran su trabajo pero dudarían en recomendar, posiblemente por lo que ven en sus equipos.'
+    }
+  };
+  const insightText=insights[type]&&insights[type][seg]?insights[type][seg]:'Análisis no disponible para este segmento.';
+  html+='<div class="modal-insight"><strong>Análisis del segmento</strong><p>'+insightText+'</p></div>';
+  openModal(seg,html);
+}
+
+// ===== ACTIONS =====
+const ACTIONS=[
+  {id:'act1',title:'Comunicación y comunicación de cambios',priority:'high',impact:'Alto',
+   desc:'42% combinado identifica comunicación (29%) y comunicación de cambios (13%) como aspecto que necesita mayor consistencia. Es la principal área de mejora.',
+   actions:['Diseñar protocolo de comunicación de cambios con plantillas y responsables','Crear canal centralizado de anuncios organizacionales','Implementar briefing quincenal de estado de la empresa','Definir matriz de audiencia: quién necesita saber qué y cuándo','Establecer feedback loop: encuesta de comunicación trimestral']},
+  {id:'act2',title:'Claridad de responsabilidades',priority:'high',impact:'Alto',
+   desc:'21% identifica la claridad de responsabilidades como aspecto que necesita consistencia. Los verbatims revelan fronteras difusas entre áreas.',
+   actions:['Elaborar matriz RACI por proceso crítico','Definir límites de área y diagramas de interacción','Documentar descripciones de puesto actualizadas','Realizar taller de alineación de roles por área','Crear sistema de escalation path para solicitudes cross-funcionales']},
+  {id:'act3',title:'Reconocimiento y plan de carrera',priority:'high',impact:'Alto',
+   desc:'13% expresa dolor por reconocimiento. Colaboradores 3+ años tienen rec 3.9. Verbatims contundentes sobre falta de promociones y plan de carrera.',
+   actions:['Diseñar plan de carrera por área con niveles y criterios objetivos','Implementar programa de reconocimiento mensual (público y privado)','Crear presupuesto de capacitación individual anual','Definir y comunicar criterios de promoción','Mapear trayectorias verticales y horizontales existentes','Encuesta de stay-interview para talento 2+ años']},
+  {id:'act4',title:'Organización y procesos',priority:'medium',impact:'Medio',
+   desc:'18% identifica la organización como aspecto que necesita mayor consistencia. Relacionado con claridad de responsabilidades.',
+   actions:['Mapear procesos críticos cross-funcionales','Identificar y eliminar duplicidad de esfuerzos','Implementar retrospectivas de proceso trimestrales','Optimizar flujos de aprobación']},
+  {id:'act5',title:'Forma de tomar decisiones',priority:'medium',impact:'Medio',
+   desc:'16% identifica la forma de tomar decisiones como aspecto que necesita consistencia. La agilidad decisional es un diferenciador que puede estar erosionándose.',
+   actions:['Definir niveles de decisión: autónomo, consultivo, colegiado','Documentar decisiones clave y racional en wiki interna','Capacitar líderes en marcos decisionales','Reducir capas de aprobación innecesarias']},
+  {id:'act6',title:'Visibilidad externa / Employee advocacy',priority:'high',impact:'Alto',
+   desc:'Los atributos más valiosos (personas 34%, cercanía 29%, confianza 42%) son invisibles externamente. El employee advocacy es la palanca de menor costo y mayor impacto.',
+   actions:['Programa de employee advocacy con grupo 1-3 años como embajadores','Guía de contenido para redes sociales','Sesiones mensuales de storytelling interno','Kit de herramientas: plantillas de LinkedIn, hashtags, temas','Reconocer y amplificar contenido generado por empleados','Métricas: alcance, engagement, aplicaciones via referral']},
+  {id:'act7',title:'Prestaciones competitivas',priority:'medium',impact:'Medio',
+   desc:'Info contradictoria en Indeed ("solo los de ley"). 3% interno menciona salarios como inconsistencia. Necesita investigación antes de comunicación.',
+   actions:['Benchmark salarial vs. mercado tech/retail en México','Auditar prestaciones: identificar gaps vs. competencia','Diseñar paquete de prestaciones diferenciado','Comunicar valor total del paquete (salario + prestaciones + flexibilidad)','Investigar y responder claims en Indeed/Glassdoor']},
+  {id:'act8',title:'Onboarding consistente',priority:'medium',impact:'Medio',
+   desc:'Los colaboradores con menos de 3 meses reportan experiencia 7.8 (la más baja). El onboarding es irregular y afecta la primera impresión.',
+   actions:['Diseñar journey de onboarding 30-60-90 días','Crear checklist de onboarding por área','Asignar buddy/onboarding partner formal','Documentar knowledge base de procesos y herramientas','Encuesta de onboarding a 30 y 60 días','Session de bienvenida mensual con liderazgo']}
+];
+
+function renderActions(){
+  const grid=document.getElementById('actionGrid');
+  let html='';
+  ACTIONS.forEach(a=>{
+    const savedStatus=localStorage.getItem('action_status_'+a.id)||'pending';
+    html+='<div class="action-card '+a.priority+'" data-priority="'+a.priority+'" data-status="'+savedStatus+'" id="'+a.id+'">';
+    html+='<div class="ac-header"><div class="ac-title">'+a.title+'</div><div class="ac-badge '+a.priority+'">'+(a.priority==='high'?'Prioridad ALTA':'Prioridad MEDIA')+'</div></div>';
+    html+='<div class="ac-desc">'+a.desc+'</div>';
+    html+='<ul class="ac-actions">';
+    a.actions.forEach((act,i)=>{
+      const cbId=a.id+'_cb_'+i;
+      const checked=localStorage.getItem(cbId)==='true'?'checked':'';
+      html+='<li><input type="checkbox" id="'+cbId+'" '+checked+' onchange="saveCheckbox(\''+cbId+'\')"><label for="'+cbId+'">'+act+'</label></li>';
+    });
+    html+='</ul>';
+    html+='<div class="ac-footer"><div class="ac-impact">Impacto esperado: <span>'+a.impact+'</span></div>';
+    html+='<select class="ac-status '+savedStatus+'" onchange="saveActionStatus(\''+a.id+'\',this.value)"><option value="pending" '+(savedStatus==='pending'?'selected':'')+'>Pendiente</option><option value="progress" '+(savedStatus==='progress'?'selected':'')+'>En progreso</option><option value="done" '+(savedStatus==='done'?'selected':'')+'>Completado</option></select></div>';
+    html+='</div>';
+  });
+  grid.innerHTML=html;
+}
+function saveCheckbox(id){localStorage.setItem(id,document.getElementById(id).checked)}
+function saveActionStatus(id,val){
+  localStorage.setItem('action_status_'+id,val);
+  const card=document.getElementById(id);
+  card.dataset.status=val;
+  const sel=card.querySelector('.ac-status');
+  sel.className='ac-status '+val;
+  filterActions();
+}
+function filterActions(){
+  const fp=document.getElementById('actionFilterPriority').value;
+  const fs=document.getElementById('actionFilterStatus').value;
+  document.querySelectorAll('.action-card').forEach(c=>{
+    const showP=!fp||c.dataset.priority===fp;
+    const showS=!fs||c.dataset.status===fs;
+    c.style.display=(showP&&showS)?'':'none';
+  });
+}
+
+// ===== ACCORDION =====
+const DIMENSIONS=[
+  {title:'1. Brecha interno vs. externo',questions:['¿Qué dirías a alguien que está considerando venir a trabajar a GetIn y nos busca en internet primero?','¿Qué contenido sobre GetIn te gustaría ver en redes sociales como colaborador?','¿Compartirías contenido sobre tu trabajo en GetIn en tus redes personales? ¿Qué te lo facilitaría o dificultaría?','Si buscaste información de GetIn antes de entrar, ¿qué encontraste y qué te faltó encontrar?']},
+  {title:'2. Atributos diferenciales vs. mercado',questions:['¿Qué ofrece GetIn que no podrías encontrar en otra empresa del sector tech/retail en México?','¿Qué empresas consideras que son competencia directa de GetIn para atraer talento?','¿Qué te hizo elegir GetIn sobre otras opciones cuando decidiste entrar?']},
+  {title:'3. Pipeline de talento y atracción',questions:['¿Por qué canal llegaste a GetIn?','¿Qué te atrajo inicialmente de la propuesta?','¿Qué información recibiste durante el proceso de selección? ¿Qué faltó?']},
+  {title:'4. eNPS y drivers de recomendación',questions:['En una escala del 0 al 10, ¿qué tan probable es que recomiendes GetIn como lugar para trabajar?','¿Cuál es la principal razón de tu calificación?','¿Qué debería mejorar GetIn para que subas tu calificación en 2 puntos?']},
+  {title:'5. Diversidad e inclusión',questions:['¿Sientes que GetIn es un lugar donde personas con perfiles distintos tienen la misma experiencia?','¿Has presenciado o experimentado situaciones donde la diversidad no fue respetada?','¿Qué haría GetIn para ser más inclusivo?']},
+  {title:'6. Onboarding journey',questions:['¿Cómo fue tu primer día, primera semana y primer mes en GetIn?','¿Qué información o apoyo te faltó en los primeros 30 días?','¿En qué momento sentiste que dejaste de ser "nuevo" y pasaste a ser parte del equipo?']},
+  {title:'7. Reconocimiento y carrera',questions:['¿Tienes claridad sobre cómo crecer profesionalmente en GetIn?','¿Qué tipo de reconocimiento valoras más: público, privado, económico, de tiempo?','¿Conoces a alguien que haya crecido verticalmente en GetIn? ¿Cómo lo logró?']},
+  {title:'8. Prestaciones y compensación',questions:['¿Consideras que las prestaciones de GetIn son competitivas vs. el mercado?','¿Qué prestación o beneficio agregarías si pudieras?','¿La información sobre prestaciones fue clara desde el proceso de selección?']}
+];
+
+function renderAccordion(){
+  const acc=document.getElementById('accordion');
+  let html='';
+  DIMENSIONS.forEach((d,i)=>{
+    html+='<div class="acc-item" id="acc'+i+'">';
+    html+='<div class="acc-header" onclick="toggleAccordion('+i+')">'+d.title+'<span class="acc-arrow">▶</span></div>';
+    html+='<div class="acc-body"><div class="acc-body-inner"><ol>';
+    d.questions.forEach(q=>{html+='<li>'+q+'</li>'});
+    html+='</ol></div></div></div>';
+  });
+  acc.innerHTML=html;
+}
+function toggleAccordion(i){
+  document.getElementById('acc'+i).classList.toggle('open');
+}
+
+// ===== CHARTS =====
+const EMERALD='#10b981',MINT='#2dd4bf',TEAL='#14b8a6',ACCENT='#34d399',DARK='#0f172a',GRAY='#64748b',RED='#ef4444',AMBER='#f59e0b',SLATE='#94a3b8';
+const GRID_COLOR='rgba(100,116,139,.1)';
+const TEXT_COLOR='#94a3b8';
+const LABEL_COLOR='#cbd5e1';
+
+function barChartHorizontal(id,labels,dataPct,values,color,label){
+  const ctx=document.getElementById(id);
+  if(!ctx)return null;
+  return new Chart(ctx,{type:'bar',data:{labels:labels,datasets:[{label:label,data:dataPct,backgroundColor:color,borderColor:color,borderWidth:0,borderRadius:4}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return c.raw+'% ('+values[c.dataIndex]+' respuestas)'}}}},scales:{x:{beginAtZero:true,max:65,grid:{color:GRID_COLOR},ticks:{color:TEXT_COLOR,callback:function(c){return c+'%'}}},y:{grid:{display:false},ticks:{color:LABEL_COLOR,font:{size:11}}}}}});
+}
+
+function makeChart(id,config){
+  const ctx=document.getElementById(id);
+  if(!ctx)return null;
+  return new Chart(ctx,config);
+}
+
+// Tab 1 charts
+function initTab1Charts(){
+  const expLabels=DATA.expDist.filter(d=>d.v>0).map(d=>'Experiencia '+d.l);
+  const expData=DATA.expDist.filter(d=>d.v>0).map(d=>d.p);
+  const expVals=DATA.expDist.filter(d=>d.v>0).map(d=>d.v);
+  makeChart('chartExpDist',{type:'bar',data:{labels:expLabels,datasets:[{data:expData,backgroundColor:EMERALD,borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return c.raw+'% ('+expVals[c.dataIndex]+' respuestas)'}}}},scales:{y:{beginAtZero:true,grid:{color:GRID_COLOR},ticks:{color:TEXT_COLOR,callback:function(c){return c+'%'}}},x:{grid:{display:false},ticks:{color:LABEL_COLOR,font:{size:11}}}}}});
+
+  const recLabels=DATA.recDist.filter(d=>d.v>0).map(d=>'Recomendación '+d.l);
+  const recData=DATA.recDist.filter(d=>d.v>0).map(d=>d.p);
+  const recVals=DATA.recDist.filter(d=>d.v>0).map(d=>d.v);
+  const recColors=DATA.recDist.filter(d=>d.v>0).map(d=>d.l==='5'?EMERALD:d.l==='4'?MINT:d.l==='3'?AMBER:RED);
+  makeChart('chartRecDist',{type:'bar',data:{labels:recLabels,datasets:[{data:recData,backgroundColor:recColors,borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return c.raw+'% ('+recVals[c.dataIndex]+' respuestas)'}}}},scales:{y:{beginAtZero:true,grid:{color:GRID_COLOR},ticks:{color:TEXT_COLOR,callback:function(c){return c+'%'}}},x:{grid:{display:false},ticks:{color:LABEL_COLOR}}}}});
+}
+
+// Segment charts
+function initSegmentCharts(){
+  // Area
+  const areaLabels=DATA.area.map(a=>a.n);
+  makeChart('chartExpArea',{type:'bar',data:{labels:areaLabels,datasets:[{label:'Experiencia',data:DATA.area.map(a=>a.exp),backgroundColor:DATA.area.map(a=>a.exp<8.5?RED:EMERALD),borderRadius:4}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,max:10,grid:{color:GRID_COLOR},ticks:{color:TEXT_COLOR}},y:{grid:{display:false},ticks:{color:LABEL_COLOR,font:{size:11}}}}}});
+  makeChart('chartRecArea',{type:'bar',data:{labels:areaLabels,datasets:[{label:'Recomendación',data:DATA.area.map(a=>a.rec),backgroundColor:DATA.area.map(a=>a.rec<4.5?RED:EMERALD),borderRadius:4}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,max:5,grid:{color:GRID_COLOR},ticks:{color:TEXT_COLOR}},y:{grid:{display:false},ticks:{color:LABEL_COLOR,font:{size:11}}}}}});
+
+  // Antig
+  const antLabels=DATA.antig.map(a=>a.n);
+  makeChart('chartExpAntig',{type:'bar',data:{labels:antLabels,datasets:[{data:DATA.antig.map(a=>a.exp),backgroundColor:DATA.antig.map(a=>a.exp<8.5?RED:EMERALD),borderRadius:4}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,max:10,grid:{color:GRID_COLOR},ticks:{color:TEXT_COLOR}},y:{grid:{display:false},ticks:{color:LABEL_COLOR,font:{size:10}}}}}});
+  makeChart('chartRecAntig',{type:'bar',data:{labels:antLabels,datasets:[{data:DATA.antig.map(a=>a.rec),backgroundColor:DATA.antig.map(a=>a.rec<4.5?RED:EMERALD),borderRadius:4}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,max:5,grid:{color:GRID_COLOR},ticks:{color:TEXT_COLOR}},y:{grid:{display:false},ticks:{color:LABEL_COLOR,font:{size:10}}}}}});
+
+  // Tipo
+  const tipoLabels=DATA.tipo.map(a=>a.n);
+  makeChart('chartExpTipo',{type:'bar',data:{labels:tipoLabels,datasets:[{data:DATA.tipo.map(a=>a.exp),backgroundColor:DATA.tipo.map(a=>a.exp<8.5?RED:EMERALD),borderRadius:4}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,max:10,grid:{color:GRID_COLOR},ticks:{color:TEXT_COLOR}},y:{grid:{display:false},ticks:{color:LABEL_COLOR,font:{size:10}}}}}});
+  makeChart('chartRecTipo',{type:'bar',data:{labels:tipoLabels,datasets:[{data:DATA.tipo.map(a=>a.rec),backgroundColor:DATA.tipo.map(a=>a.rec<4.5?RED:EMERALD),borderRadius:4}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,max:5,grid:{color:GRID_COLOR},ticks:{color:TEXT_COLOR}},y:{grid:{display:false},ticks:{color:LABEL_COLOR,font:{size:10}}}}}});
+}
+
+// Anexo charts
+function initAnexoCharts(){
+  // Radar P5
+  makeChart('radarP5',{type:'radar',data:{labels:DATA.p5.map(d=>d.n),datasets:[{label:'% que lo identifica',data:DATA.p5.map(d=>d.p),backgroundColor:'rgba(16,185,129,.2)',borderColor:EMERALD,pointBackgroundColor:EMERALD,pointBorderColor:'#0f172a',pointRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{r:{beginAtZero:true,max:60,grid:{color:GRID_COLOR},angleLines:{color:GRID_COLOR},pointLabels:{font:{size:10},color:LABEL_COLOR},ticks:{color:TEXT_COLOR,backdropColor:'transparent'}}}}});
+
+  // Radar P12
+  makeChart('radarP12',{type:'radar',data:{labels:DATA.p12.map(d=>d.n),datasets:[{label:'% que lo valora',data:DATA.p12.map(d=>d.p),backgroundColor:'rgba(45,212,191,.2)',borderColor:MINT,pointBackgroundColor:MINT,pointBorderColor:'#0f172a',pointRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{r:{beginAtZero:true,max:50,grid:{color:GRID_COLOR},angleLines:{color:GRID_COLOR},pointLabels:{font:{size:10},color:LABEL_COLOR},ticks:{color:TEXT_COLOR,backdropColor:'transparent'}}}}});
+
+  // Bar P15
+  barChartHorizontal('barP15',DATA.p15.map(d=>d.n),DATA.p15.map(d=>d.p),DATA.p15.map(d=>d.v),EMERALD,'% distintivo');
+  // Bar P17
+  barChartHorizontal('barP17',DATA.p17.map(d=>d.n),DATA.p17.map(d=>d.p),DATA.p17.map(d=>d.v),MINT,'% cultural');
+  // Bar P21 (inconsistencia - red tones)
+  barChartHorizontal('barP21',DATA.p21.map(d=>d.n),DATA.p21.map(d=>d.p),DATA.p21.map(d=>d.v),'rgba(239,68,68,.7)','% inconsistencia');
+  // Bar P10
+  barChartHorizontal('barP10',DATA.p10.map(d=>d.n),DATA.p10.map(d=>d.p),DATA.p10.map(d=>d.v),ACCENT,'% motivador');
+
+  // Grouped bar charts
+  const areaLabels=DATA.area.map(a=>a.n);
+  makeChart('grpArea',{type:'bar',data:{labels:areaLabels,datasets:[{label:'Experiencia',data:DATA.area.map(a=>a.exp),backgroundColor:EMERALD,borderRadius:4},{label:'Recomendación ×2',data:DATA.area.map(a=>a.rec*2),backgroundColor:DARK,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{color:LABEL_COLOR}}},scales:{y:{beginAtZero:true,max:10,grid:{color:GRID_COLOR},ticks:{color:TEXT_COLOR}},x:{grid:{display:false},ticks:{color:LABEL_COLOR,font:{size:11}}}}}});
+
+  const antLabels=DATA.antig.map(a=>a.n);
+  makeChart('grpAntig',{type:'bar',data:{labels:antLabels,datasets:[{label:'Experiencia',data:DATA.antig.map(a=>a.exp),backgroundColor:EMERALD,borderRadius:4},{label:'Recomendación ×2',data:DATA.antig.map(a=>a.rec*2),backgroundColor:DARK,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{color:LABEL_COLOR}}},scales:{y:{beginAtZero:true,max:10,grid:{color:GRID_COLOR},ticks:{color:TEXT_COLOR}},x:{grid:{display:false},ticks:{color:LABEL_COLOR,font:{size:10}}}}}});
+
+  const tipoLabels=DATA.tipo.map(a=>a.n);
+  makeChart('grpTipo',{type:'bar',data:{labels:tipoLabels,datasets:[{label:'Experiencia',data:DATA.tipo.map(a=>a.exp),backgroundColor:EMERALD,borderRadius:4},{label:'Recomendación ×2',data:DATA.tipo.map(a=>a.rec*2),backgroundColor:DARK,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{color:LABEL_COLOR}}},scales:{y:{beginAtZero:true,max:10,grid:{color:GRID_COLOR},ticks:{color:TEXT_COLOR}},x:{grid:{display:false},ticks:{color:LABEL_COLOR,font:{size:10}}}}}});
+
+  // Distribution charts
+  const expAll=DATA.expDist.map(d=>d.l);
+  const expAllV=DATA.expDist.map(d=>d.v);
+  makeChart('distExp',{type:'bar',data:{labels:expAll.map(l=>'Experiencia '+l),datasets:[{data:expAllV,backgroundColor:expAll.map(l=>l>=9?EMERALD:l>=7?MINT:l>=5?TEAL:l>=3?SLATE:RED),borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return c.raw+' respuestas ('+Math.round(c.raw/38*100)+'%)'}}}},scales:{y:{beginAtZero:true,grid:{color:GRID_COLOR},ticks:{color:TEXT_COLOR}},x:{grid:{display:false},ticks:{color:LABEL_COLOR,font:{size:10}}}}}});
+
+  // Donut Rec
+  const recLabels=DATA.recDist.filter(d=>d.v>0).map(d=>'Rec '+d.l);
+  const recVals=DATA.recDist.filter(d=>d.v>0).map(d=>d.v);
+  const recColors=[EMERALD,MINT,AMBER,RED].slice(0,recVals.length);
+  makeChart('distRecDonut',{type:'doughnut',data:{labels:recLabels,datasets:[{data:recVals,backgroundColor:recColors,borderWidth:2,borderColor:'#0f172a'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:LABEL_COLOR,font:{size:12}}},tooltip:{callbacks:{label:function(c){return c.label+': '+c.raw+' ('+Math.round(c.raw/38*100)+'%)'}}}}}});
+
+  // Donut Area
+  const areaColors=[EMERALD,MINT,TEAL,DARK,SLATE,AMBER,RED];
+  makeChart('distAreaDonut',{type:'doughnut',data:{labels:DATA.area.map(function(a){return a.n+' ('+a.n_resp+')'}),datasets:[{data:DATA.area.map(a=>a.n_resp),backgroundColor:areaColors,borderWidth:2,borderColor:'#0f172a'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:LABEL_COLOR,font:{size:11}}}}}});
+
+  // Donut Antig
+  const antigColors=[EMERALD,MINT,TEAL,DARK,SLATE];
+  makeChart('distAntigDonut',{type:'doughnut',data:{labels:DATA.antig.map(function(a){return a.n+' ('+a.n_resp+')'}),datasets:[{data:DATA.antig.map(a=>a.n_resp),backgroundColor:antigColors,borderWidth:2,borderColor:'#0f172a'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:LABEL_COLOR,font:{size:11}}}}}});
+}
+
+// ===== INIT =====
+renderMatrix();
+renderBrecha();
+renderActions();
+renderAccordion();
+renderAreaCards();
+// Tab 2: Hallazgos matrices
+renderHallazgosMatrix('hallazgosAntigBody',['Transversal','\u003C3 meses','3-6 meses','6-12 meses','1-3 a\u00F1os','3+ a\u00F1os'],HALLAZGOS.map(h=>h.antig));
+renderHallazgosMatrix('hallazgosTipoBody',['Transversal','Ejecuci\u00F3n','Especialista','Ejec+Esp','Multirol','Gu\u00EDa/Lead'],HALLAZGOS.map(h=>h.tipo_act));
+renderHallazgosMatrix('hallazgosAreaBody',['Transversal','Operaciones','Comercial','BI','IT','Tech Support','Finanzas + Otros'],HALLAZGOS.map(h=>h.area));
+renderAreaContext('OP');
+initTab1Charts();
+initSegmentCharts();
+initAnexoCharts();
+</script>
+</body>
+</html>
