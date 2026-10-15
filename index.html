@@ -280,6 +280,48 @@ table.matrix tr:hover td{background:rgba(45,212,191,.03)}
 .verbatims-col .v-item{font-style:italic;color:#cbd5e1;background:rgba(45,212,191,.04);border-left:3px solid var(--teal);padding:10px 14px;border-radius:6px;margin:8px 0;font-size:12px;line-height:1.6}
 .verbatims-col.noprom .v-item{border-left-color:var(--amber)}
 .click-hint{font-size:11px;color:var(--gray);margin-top:6px;text-align:center;opacity:.7}
+/* ===== EDITABLE ACTIONS ===== */
+.btn-add-plan{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:8px;background:linear-gradient(135deg,var(--emerald),var(--teal));color:var(--navy);font-family:var(--font);font-size:13px;font-weight:700;border:none;cursor:pointer;transition:transform .2s,box-shadow .2s}
+.btn-add-plan:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(16,185,129,.3)}
+.action-card .ac-edit-btns{display:flex;gap:6px;margin-left:auto}
+.action-card .ac-edit-btns button{padding:4px 10px;border-radius:6px;font-size:11px;font-family:var(--font);font-weight:600;cursor:pointer;border:1px solid rgba(45,212,191,.2);background:rgba(45,212,191,.08);color:var(--mint);transition:background .2s}
+.action-card .ac-edit-btns button:hover{background:rgba(45,212,191,.18)}
+.action-card .ac-edit-btns button.del-btn{border-color:rgba(239,68,68,.2);background:rgba(239,68,68,.08);color:#fca5a5}
+.action-card .ac-edit-btns button.del-btn:hover{background:rgba(239,68,68,.18)}
+.action-card .ac-item-edit{display:flex;align-items:flex-start;gap:6px;padding:4px 0}
+.action-card .ac-item-edit input[type=text]{flex:1;padding:4px 8px;font-size:13px;color:#e2e8f0;background:var(--navy);border:1px solid rgba(45,212,191,.2);border-radius:6px;font-family:var(--font)}
+.action-card .ac-item-edit input[type=text]:focus{outline:none;border-color:var(--emerald);box-shadow:0 0 0 2px rgba(16,185,129,.2)}
+.action-card .ac-item-edit button{padding:4px 8px;font-size:11px;border-radius:6px;cursor:pointer;border:none;font-family:var(--font);font-weight:600}
+.action-card .ac-item-edit .item-del{background:rgba(239,68,68,.1);color:#fca5a5}
+.action-card .ac-item-edit .item-del:hover{background:rgba(239,68,68,.2)}
+.action-card .ac-add-item{padding:6px 0}
+.action-card .ac-add-item button{padding:4px 12px;font-size:12px;border-radius:6px;cursor:pointer;border:1px dashed rgba(45,212,191,.3);background:transparent;color:var(--mint);font-family:var(--font);font-weight:500}
+.action-card .ac-add-item button:hover{background:rgba(45,212,191,.05)}
+.action-card.editing .ac-title-input{font-size:15px;font-weight:600;color:#f1f5f9;background:var(--navy);border:1px solid rgba(45,212,191,.2);border-radius:6px;padding:4px 8px;font-family:var(--font);width:100%;margin-bottom:8px}
+.action-card.editing .ac-title-input:focus{outline:none;border-color:var(--emerald);box-shadow:0 0 0 2px rgba(16,185,129,.2)}
+.action-card.editing .ac-desc-input{width:100%;min-height:60px;padding:8px;font-size:13px;color:#e2e8f0;background:var(--navy);border:1px solid rgba(45,212,191,.2);border-radius:6px;font-family:var(--font);resize:vertical;margin-bottom:8px}
+.action-card.editing .ac-desc-input:focus{outline:none;border-color:var(--emerald);box-shadow:0 0 0 2px rgba(16,185,129,.2)}
+.action-card.editing .ac-area-checks{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.action-card.editing .ac-area-checks label{display:flex;align-items:center;gap:4px;font-size:11px;color:#cbd5e1;cursor:pointer}
+.action-card.editing .ac-area-checks input{accent-color:var(--emerald)}
+.action-card .ac-edit-row{display:flex;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid rgba(100,116,139,.15);align-items:center}
+.action-card .ac-edit-row button{padding:6px 16px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:none;font-family:var(--font)}
+.action-card .ac-edit-row .save-btn{background:var(--emerald);color:var(--navy)}
+.action-card .ac-edit-row .cancel-btn{background:rgba(100,116,139,.2);color:#e2e8f0}
+.action-card .ac-edit-row .priority-sel{padding:6px 10px;border-radius:6px;font-size:12px;background:var(--navy);color:#e2e8f0;border:1px solid rgba(45,212,191,.2);font-family:var(--font)}
+.new-plan-form{background:linear-gradient(135deg,var(--navy) 0%,var(--dark) 100%);border-radius:10px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.2);border:1px solid rgba(45,212,191,.08);border-top:4px solid var(--emerald);margin-bottom:16px}
+.new-plan-form input[type=text],.new-plan-form textarea{width:100%;padding:8px 12px;font-size:13px;color:#e2e8f0;background:var(--dark);border:1px solid rgba(45,212,191,.2);border-radius:6px;font-family:var(--font);margin-bottom:10px}
+.new-plan-form input[type=text]:focus,.new-plan-form textarea:focus{outline:none;border-color:var(--emerald);box-shadow:0 0 0 2px rgba(16,185,129,.2)}
+.new-plan-form textarea{min-height:60px;resize:vertical}
+.new-plan-form label{font-size:12px;color:var(--gray);display:block;margin-bottom:4px;font-weight:600}
+.new-plan-form .form-row{margin-bottom:10px}
+.new-plan-form .area-checks{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.new-plan-form .area-checks label{display:flex;align-items:center;gap:4px;font-size:12px;color:#cbd5e1;cursor:pointer}
+.new-plan-form .area-checks input{accent-color:var(--emerald)}
+.new-plan-form .form-actions{display:flex;gap:8px}
+.new-plan-form .form-actions button{padding:8px 20px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:var(--font)}
+.new-plan-form .form-actions .save-btn{background:var(--emerald);color:var(--navy)}
+.new-plan-form .form-actions .cancel-btn{background:rgba(100,116,139,.2);color:#e2e8f0}
 @media(max-width:1024px){
   .kpi-grid{grid-template-columns:repeat(2,1fr)}
   .finding-grid{grid-template-columns:repeat(2,1fr)}
@@ -314,6 +356,7 @@ table.matrix tr:hover td{background:rgba(45,212,191,.03)}
   <button class="tab-btn active" data-tab="tab1">Resumen Ejecutivo</button>
   <button class="tab-btn" data-tab="tab2">Matriz de Hallazgos</button>
   <button class="tab-btn" data-tab="tab3">Hallazgos por Área</button>
+  <button class="tab-btn" data-tab="tab-brecha">Brecha Interno vs Externo</button>
   <button class="tab-btn" data-tab="tab4">Análisis por Segmentos</button>
   <button class="tab-btn" data-tab="tab5">Planes de Acción</button>
   <button class="tab-btn" data-tab="tab6">Fase del Análisis</button>
@@ -442,6 +485,54 @@ table.matrix tr:hover td{background:rgba(45,212,191,.03)}
   <div class="area-cards-grid" id="areaCardsGrid"></div>
 </section>
 
+<!-- ===== TAB BRECHA: INTERNO VS EXTERNO ===== -->
+<section class="tab-content" id="tab-brecha">
+  <div class="matrix-wrap">
+    <h3>Matriz de Brecha: Señal Interna vs. Señal Externa</h3>
+    <p>Comparación entre lo que viven los colaboradores internamente y lo que el mercado externo percibe. Haz clic en un atributo para ver el detalle. <span class="dot-green"></span> Convergencia · <span class="dot-amber"></span> Brecha narrativa · <span class="dot-red"></span> Vacío crítico</p>
+    <table class="matrix" id="brechaTable">
+      <thead>
+        <tr>
+          <th>Atributo</th><th>Señal Interna (%)</th><th>Señal Externa</th><th>Estado de Brecha</th><th>Acción Recomendada</th>
+        </tr>
+      </thead>
+      <tbody id="brechaBody"></tbody>
+    </table>
+  </div>
+
+  <div class="finding-grid" style="margin-top:24px">
+    <div class="finding-card yellow">
+      <div class="f-icon"><i class="fa-solid fa-building" style="color:var(--amber)"></i></div>
+      <div class="f-title">Marca corporativa sólida, marca empleadora embrionaria</div>
+      <div class="f-desc">GetIn tiene una marca corporativa fuerte (innovación, consultoría tech) pero la marca empleadora no existe como narrativa estructurada. El mercado conoce a la empresa, no la experiencia de trabajar ahí.</div>
+    </div>
+    <div class="finding-card red">
+      <div class="f-icon"><i class="fa-solid fa-eye-slash" style="color:var(--red)"></i></div>
+      <div class="f-title">Los atributos más valiosos son los más invisibles</div>
+      <div class="f-desc">Las personas (34%), la cercanía (29%) y la confianza (42%) son los atributos más valorados internamente y son completamente inexistentes en la señal externa. El corazón del employer brand no tiene huella digital.</div>
+    </div>
+    <div class="finding-card green">
+      <div class="f-icon"><i class="fa-solid fa-circle-check" style="color:var(--emerald)"></i></div>
+      <div class="f-title">Atributos listos vs. atributos a desarrollar</div>
+      <div class="f-desc">Innovación (58%) y aprendizaje (42%) están listos para comunicar ahora. Flexibilidad (45%) necesita reforzamiento narrativo. Los atributos humanos requieren producto (employee advocacy) antes de comunicación.</div>
+    </div>
+    <div class="finding-card red">
+      <div class="f-icon"><i class="fa-solid fa-flag" style="color:var(--red)"></i></div>
+      <div class="f-title">Prestaciones: bandera roja en Indeed</div>
+      <div class="f-desc">Externamente hay información contradictoria sobre prestaciones en Indeed ("solo los de ley"). Internamente solo 3% lo menciona como dolor. La divergencia es peligrosa: el mercado percibe debilidad antes que el equipo interno.</div>
+    </div>
+    <div class="finding-card green">
+      <div class="f-icon"><i class="fa-solid fa-bullhorn" style="color:var(--emerald)"></i></div>
+      <div class="f-title">Employee advocacy = palanca de alto impacto</div>
+      <div class="f-desc">El grupo 1-3 años (n=13, exp 8.9, rec 4.6) son embajadores naturales. Activar employee advocacy con ellos es la palanca de menor costo y mayor autenticidad para cerrar la brecha interno/externo.</div>
+    </div>
+  </div>
+
+  <div class="insight-box" style="margin-top:8px">
+    <strong>Insight clave:</strong> GetIn no tiene un problema de experiencia colaboradora: tiene un problema de traducción. La experiencia existe, es positiva y es diferencial. Lo que falta es convertirla en narrativa visible para el mercado.
+  </div>
+</section>
+
 <!-- ===== TAB 4: SEGMENTOS ===== -->
 <section class="tab-content" id="tab4">
   <div class="subtab-nav">
@@ -520,6 +611,10 @@ table.matrix tr:hover td{background:rgba(45,212,191,.03)}
       <option value="">Todas</option><option value="OP">Operaciones</option><option value="COM">Comercial</option><option value="BI">BI</option><option value="IT">IT</option><option value="TS">Tech Support</option><option value="FIN">Finanzas + Otros</option>
     </select>
   </div>
+  <div style="margin-bottom:16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+    <button class="btn-add-plan" onclick="showAddPlanForm()"><i class="fa-solid fa-plus"></i> Agregar plan</button>
+  </div>
+  <div id="addPlanFormContainer"></div>
   <div class="action-grid" id="actionGrid"></div>
 </section>
 
@@ -1000,7 +1095,7 @@ function openAreaCardModal(key){
   // Planes de acción — sincronizados con Planes de Acción
   if(ctx&&ctx.acciones&&ctx.acciones.length){
     html+='<h4 style="margin-top:16px"><i class="fa-solid fa-list-check" style="color:var(--accent)"></i> Planes de acción</h4>';
-    ACTIONS.forEach(a=>{
+    getActions().forEach(a=>{
       if(!a.areas.includes(key))return;
       const savedStatus=localStorage.getItem('action_status_'+a.id)||'pending';
       const totalItems=a.actions.length;
@@ -1069,7 +1164,7 @@ function renderAreaContext(areaKey){
   });
   html+='</div>';
   // Planes globales que también aplican a esta área
-  const globalActions=ACTIONS.filter(a=>a.areas.includes(areaKey));
+  const globalActions=getActions().filter(a=>a.areas.includes(areaKey));
   if(globalActions.length){
     html+='<h3 style="font-size:15px;font-weight:600;margin:20px 0 12px;color:#f1f5f9">Planes de acción globales que aplican <span style="font-size:11px;color:var(--gray);font-weight:400">(sincronizados con tab Planes de Acción)</span></h3>';
     html+='<div class="action-grid">';
@@ -1208,7 +1303,7 @@ function openSegmentModal(type,seg){
 }
 
 // ===== ACTIONS =====
-const ACTIONS=[
+const DEFAULT_ACTIONS=[
   {id:'act1',title:'Comunicación y comunicación de cambios',priority:'high',impact:'Alto',areas:['OP','COM','IT','TS','BI','FIN'],
    desc:'42% combinado identifica comunicación (29%) y comunicación de cambios (13%) como aspecto que necesita mayor consistencia. Es la principal área de mejora.',
    actions:['Diseñar protocolo de comunicación de cambios con plantillas y responsables','Crear canal centralizado de anuncios organizacionales','Implementar briefing quincenal de estado de la empresa','Definir matriz de audiencia: quién necesita saber qué y cuándo','Establecer feedback loop: encuesta de comunicación trimestral']},
@@ -1234,15 +1329,26 @@ const ACTIONS=[
    desc:'Los colaboradores con menos de 3 meses reportan experiencia 7.8 (la más baja). El onboarding es irregular y afecta la primera impresión.',
    actions:['Diseñar journey de onboarding 30-60-90 días','Crear checklist de onboarding por área','Asignar buddy/onboarding partner formal','Documentar knowledge base de procesos y herramientas','Encuesta de onboarding a 30 y 60 días','Session de bienvenida mensual con liderazgo']}
 ];
+const ACTIONS_KEY='custom_actions';
+function getActions(){
+  try{
+    const stored=localStorage.getItem(ACTIONS_KEY);
+    if(stored){const parsed=JSON.parse(stored);if(Array.isArray(parsed)&&parsed.length>0)return parsed}
+  }catch(e){}
+  return DEFAULT_ACTIONS;
+}
+function saveActions(actions){localStorage.setItem(ACTIONS_KEY,JSON.stringify(actions))}
+function genActionId(){return 'act_'+Date.now()+'_'+Math.floor(Math.random()*10000)}
 
 function renderActions(){
   const grid=document.getElementById('actionGrid');
+  if(!grid)return;
+  const actions=getActions();
   let html='';
-  ACTIONS.forEach(a=>{
+  actions.forEach(a=>{
     const savedStatus=localStorage.getItem('action_status_'+a.id)||'pending';
-    const areaLabels=a.areas.map(code=>{const ctx=AREA_CONTEXT[code];return ctx?ctx.name:code});
     html+='<div class="action-card '+a.priority+'" data-priority="'+a.priority+'" data-status="'+savedStatus+'" data-areas="'+a.areas.join(',')+'" id="'+a.id+'">';
-    html+='<div class="ac-header"><div class="ac-title">'+a.title+'</div><div class="ac-badge '+a.priority+'">'+(a.priority==='high'?'Prioridad ALTA':'Prioridad MEDIA')+'</div></div>';
+    html+='<div class="ac-header"><div class="ac-title">'+a.title+'</div><div class="ac-badge '+a.priority+'">'+(a.priority==='high'?'Prioridad ALTA':'Prioridad MEDIA')+'</div><div class="ac-edit-btns"><button onclick="editAction(\''+a.id+'\')"><i class="fa-solid fa-pen"></i> Editar</button><button class="del-btn" onclick="deleteAction(\''+a.id+'\')"><i class="fa-solid fa-trash"></i> Eliminar</button></div></div>';
     html+='<div class="ac-desc">'+a.desc+'</div>';
     html+='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">';
     a.areas.forEach(code=>{const ctx=AREA_CONTEXT[code];html+='<span style="padding:3px 8px;border-radius:12px;font-size:10px;background:rgba(45,212,191,.08);color:var(--mint);border:1px solid rgba(45,212,191,.15)">'+(ctx?ctx.name:code)+'</span>'});
@@ -1254,19 +1360,19 @@ function renderActions(){
       html+='<li><input type="checkbox" id="'+cbId+'" '+checked+' onchange="saveCheckbox(\''+cbId+'\')"><label for="'+cbId+'">'+act+'</label></li>';
     });
     html+='</ul>';
+    html+='<div class="ac-add-item"><button onclick="addItemToAction(\''+a.id+'\')"><i class="fa-solid fa-plus"></i> Agregar ítem</button></div>';
     html+='<div class="ac-footer"><div class="ac-impact">Impacto esperado: <span>'+a.impact+'</span></div>';
     html+='<select class="ac-status '+savedStatus+'" onchange="saveActionStatus(\''+a.id+'\',this.value)"><option value="pending" '+(savedStatus==='pending'?'selected':'')+'>Pendiente</option><option value="progress" '+(savedStatus==='progress'?'selected':'')+'>En progreso</option><option value="done" '+(savedStatus==='done'?'selected':'')+'>Completado</option></select></div>';
     html+='</div>';
   });
   grid.innerHTML=html;
+  filterActions();
 }
 function saveCheckbox(id){localStorage.setItem(id,document.getElementById(id).checked);refreshAreaContextIfOpen()}
 function saveActionStatus(id,val){
   localStorage.setItem('action_status_'+id,val);
   const card=document.getElementById(id);
-  card.dataset.status=val;
-  const sel=card.querySelector('.ac-status');
-  sel.className='ac-status '+val;
+  if(card){card.dataset.status=val;const sel=card.querySelector('.ac-status');if(sel)sel.className='ac-status '+val}
   filterActions();
   refreshAreaContextIfOpen();
 }
@@ -1274,13 +1380,143 @@ function filterActions(){
   const fp=document.getElementById('actionFilterPriority').value;
   const fs=document.getElementById('actionFilterStatus').value;
   const fa=document.getElementById('actionFilterArea').value;
-  document.querySelectorAll('.action-card').forEach(c=>{
+  document.querySelectorAll('#actionGrid .action-card').forEach(c=>{
     const showP=!fp||c.dataset.priority===fp;
     const showS=!fs||c.dataset.status===fs;
     const cardAreas=(c.dataset.areas||'').split(',');
     const showA=!fa||cardAreas.includes(fa);
     c.style.display=(showP&&showS&&showA)?'':'none';
   });
+}
+// ===== CRUD: Add / Edit / Delete plans =====
+function showAddPlanForm(){
+  const container=document.getElementById('addPlanFormContainer');
+  let areaOpts='';
+  ['OP','COM','BI','IT','TS','FIN'].forEach(code=>{const ctx=AREA_CONTEXT[code];areaOpts+='<label><input type="checkbox" value="'+code+'"> '+(ctx?ctx.name:code)+'</label>'});
+  container.innerHTML='<div class="new-plan-form">'+
+    '<div class="form-row"><label>Título del plan</label><input type="text" id="newPlanTitle" placeholder="Ej: Mejorar comunicación interna"></div>'+
+    '<div class="form-row"><label>Descripción</label><textarea id="newPlanDesc" placeholder="Describe el plan..."></textarea></div>'+
+    '<div class="form-row"><label>Prioridad</label><select id="newPlanPriority" style="padding:8px 12px;border-radius:6px;background:var(--dark);color:#e2e8f0;border:1px solid rgba(45,212,191,.2);font-family:var(--font);font-size:13px"><option value="high">Alta</option><option value="medium">Media</option></select></div>'+
+    '<div class="form-row"><label>Áreas asignadas</label><div class="area-checks">'+areaOpts+'</div></div>'+
+    '<div class="form-row"><label>Ítems (uno por línea)</label><textarea id="newPlanItems" placeholder="Diseñar protocolo...\nCrear canal...\nImplementar..."></textarea></div>'+
+    '<div class="form-actions"><button class="save-btn" onclick="addNewPlan()">Guardar plan</button><button class="cancel-btn" onclick="hideAddPlanForm()">Cancelar</button></div>'+
+    '</div>';
+  document.getElementById('newPlanTitle').focus();
+}
+function hideAddPlanForm(){document.getElementById('addPlanFormContainer').innerHTML=''}
+function addNewPlan(){
+  const title=document.getElementById('newPlanTitle').value.trim();
+  const desc=document.getElementById('newPlanDesc').value.trim();
+  const priority=document.getElementById('newPlanPriority').value;
+  const areas=[];
+  document.querySelectorAll('#addPlanFormContainer .area-checks input:checked').forEach(cb=>areas.push(cb.value));
+  const itemsRaw=document.getElementById('newPlanItems').value.trim();
+  const actions=itemsRaw?itemsRaw.split('\n').map(s=>s.trim()).filter(s=>s):[];
+  if(!title){alert('El título es obligatorio');return}
+  if(areas.length===0){alert('Selecciona al menos un área');return}
+  const newPlan={id:genActionId(),title:title,priority:priority,impact:priority==='high'?'Alto':'Medio',areas:areas,desc:desc||'',actions:actions};
+  const allActions=getActions();
+  allActions.push(newPlan);
+  saveActions(allActions);
+  hideAddPlanForm();
+  renderActions();
+  refreshAreaContextIfOpen();
+}
+function deleteAction(id){
+  if(!confirm('¿Eliminar este plan de acción? Esta acción no se puede deshacer.'))return;
+  const allActions=getActions();
+  const filtered=allActions.filter(a=>a.id!==id);
+  saveActions(filtered);
+  // Clean up localStorage checkboxes for this action
+  const keysToRemove=[];
+  for(let i=0;i<localStorage.length;i++){const key=localStorage.key(i);if(key&&key.startsWith(id+'_cb_'))keysToRemove.push(key)}
+  keysToRemove.forEach(k=>localStorage.removeItem(k));
+  localStorage.removeItem('action_status_'+id);
+  renderActions();
+  refreshAreaContextIfOpen();
+}
+function editAction(id){
+  const allActions=getActions();
+  const action=allActions.find(a=>a.id===id);
+  if(!action)return;
+  const card=document.getElementById(id);
+  if(!card)return;
+  card.classList.add('editing');
+  // Replace content with edit form
+  let areaChecks='';
+  ['OP','COM','BI','IT','TS','FIN'].forEach(code=>{const ctx=AREA_CONTEXT[code];const checked=action.areas.includes(code)?'checked':'';areaChecks+='<label><input type="checkbox" value="'+code+'" '+checked+'> '+(ctx?ctx.name:code)+'</label>'});
+  let itemsHtml='';
+  action.actions.forEach((item,i)=>{
+    itemsHtml+='<div class="ac-item-edit"><input type="text" value="'+item.replace(/"/g,'&quot;')+'" data-idx="'+i+'"><button class="item-del" onclick="this.parentElement.remove()"><i class="fa-solid fa-xmark"></i></button></div>';
+  });
+  card.innerHTML=
+    '<div class="ac-header"><input type="text" class="ac-title-input" value="'+action.title.replace(/"/g,'&quot;')+'" id="edit_title_'+id+'"></div>'+
+    '<textarea class="ac-desc-input" id="edit_desc_'+id+'">'+action.desc+'</textarea>'+
+    '<div class="ac-area-checks" id="edit_areas_'+id+'">'+areaChecks+'</div>'+
+    '<label style="font-size:12px;color:var(--gray);display:block;margin-bottom:4px;font-weight:600">Ítems del plan:</label>'+
+    '<div id="edit_items_'+id+'">'+itemsHtml+'</div>'+
+    '<div class="ac-add-item"><button onclick="addEditItem(\''+id+'\')"><i class="fa-solid fa-plus"></i> Agregar ítem</button></div>'+
+    '<div class="ac-edit-row">'+
+    '<label style="font-size:12px;color:var(--gray)">Prioridad:</label>'+
+    '<select class="priority-sel" id="edit_priority_'+id+'"><option value="high" '+(action.priority==='high'?'selected':'')+'>Alta</option><option value="medium" '+(action.priority==='medium'?'selected':'')+'>Media</option></select>'+
+    '<button class="save-btn" onclick="saveEditAction(\''+id+'\')">Guardar cambios</button>'+
+    '<button class="cancel-btn" onclick="renderActions()">Cancelar</button>'+
+    '</div>';
+}
+function addEditItem(id){
+  const container=document.getElementById('edit_items_'+id);
+  if(!container)return;
+  const div=document.createElement('div');
+  div.className='ac-item-edit';
+  div.innerHTML='<input type="text" placeholder="Nuevo ítem..." data-idx="-1"><button class="item-del" onclick="this.parentElement.remove()"><i class="fa-solid fa-xmark"></i></button>';
+  container.appendChild(div);
+}
+function saveEditAction(id){
+  const title=document.getElementById('edit_title_'+id).value.trim();
+  const desc=document.getElementById('edit_desc_'+id).value.trim();
+  const priority=document.getElementById('edit_priority_'+id).value;
+  const areas=[];
+  document.querySelectorAll('#edit_areas_'+id+' input:checked').forEach(cb=>areas.push(cb.value));
+  const items=[];
+  document.querySelectorAll('#edit_items_'+id+' input[type=text]').forEach(inp=>{const v=inp.value.trim();if(v)items.push(v)});
+  if(!title){alert('El título es obligatorio');return}
+  if(areas.length===0){alert('Selecciona al menos un área');return}
+  const allActions=getActions();
+  const idx=allActions.findIndex(a=>a.id===id);
+  if(idx===-1)return;
+  // Build new action preserving old checkbox state where possible
+  const oldActions=allActions[idx].actions||[];
+  const newCheckboxes={};
+  items.forEach((item,i)=>{
+    // Try to find a matching old item to preserve checkbox state
+    let oldIdx=-1;
+    for(let j=0;j<oldActions.length;j++){if(oldActions[j]===item){oldIdx=j;break}}
+    if(oldIdx>=0){
+      const oldCbId=id+'_cb_'+oldIdx;
+      const oldVal=localStorage.getItem(oldCbId);
+      if(oldVal!==null){newCheckboxes[id+'_cb_'+i]=oldVal;localStorage.removeItem(oldCbId)}
+    }
+  });
+  // Clean up old checkboxes that don't match anymore
+  for(let i=0;i<localStorage.length;i++){const key=localStorage.key(i);if(key&&key.startsWith(id+'_cb_')){if(!(key in newCheckboxes)){localStorage.removeItem(key);i--}}}
+  // Apply new checkbox state
+  Object.entries(newCheckboxes).forEach(([k,v])=>localStorage.setItem(k,v));
+  allActions[idx]={...allActions[idx],title:title,desc:desc,priority:priority,impact:priority==='high'?'Alto':'Medio',areas:areas,actions:items};
+  saveActions(allActions);
+  renderActions();
+  refreshAreaContextIfOpen();
+}
+function addItemToAction(id){
+  const allActions=getActions();
+  const action=allActions.find(a=>a.id===id);
+  if(!action)return;
+  const newText=prompt('Nuevo ítem:');
+  if(newText&&newText.trim()){
+    action.actions.push(newText.trim());
+    saveActions(allActions);
+    renderActions();
+    refreshAreaContextIfOpen();
+  }
 }
 function refreshAreaContextIfOpen(){
   const selector=document.getElementById('areaContextSelector');
