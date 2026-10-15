@@ -1045,32 +1045,54 @@ function renderAreaContext(areaKey){
   html+='</ul></div></div>';
   // Insights
   html+='<div class="insight-box"><strong>Insights clave — '+ctx.name+'</strong> '+ctx.insights+'</div>';
-  // Acciones — sincronizadas con Planes de Acción
-  html+='<h3 style="font-size:15px;font-weight:600;margin:20px 0 12px;color:#f1f5f9">Planes de acción relevantes <span style="font-size:11px;color:var(--gray);font-weight:400">(sincronizado con tab Planes de Acción)</span></h3>';
+  // Acciones específicas del área — con checkboxes sincronizados
+  html+='<h3 style="font-size:15px;font-weight:600;margin:20px 0 12px;color:#f1f5f9">Planes de acción del área <span style="font-size:11px;color:var(--gray);font-weight:400">(los cambios se sincronizan con Planes de Acción)</span></h3>';
   html+='<div class="action-grid">';
-  ACTIONS.forEach(a=>{
-    if(!a.areas.includes(areaKey))return;
-    const savedStatus=localStorage.getItem('action_status_'+a.id)||'pending';
-    const totalItems=a.actions.length;
+  ctx.acciones.forEach((a,i)=>{
+    const actId='ctx_'+areaKey+'_'+i;
+    const totalItems=a.items.length;
     let checkedItems=0;
-    a.actions.forEach((act,i)=>{if(localStorage.getItem(a.id+'_cb_'+i)==='true')checkedItems++});
+    a.items.forEach((item,j)=>{if(localStorage.getItem(actId+'_'+j)==='true')checkedItems++});
     const progressPct=Math.round(checkedItems/totalItems*100);
-    html+='<div class="action-card '+a.priority+'" data-status="'+savedStatus+'">';
-    html+='<div class="ac-header"><div class="ac-title">'+a.title+'</div><div class="ac-badge '+a.priority+'">'+(a.priority==='high'?'ALTA':'MEDIA')+'</div></div>';
+    html+='<div class="action-card medium">';
+    html+='<div class="ac-header"><div class="ac-title">'+a.titulo+'</div><div class="ac-badge medium">Acción</div></div>';
     html+='<div class="ac-desc">'+a.desc+'</div>';
     // Barra de progreso
     html+='<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--gray);margin-bottom:4px"><span>'+checkedItems+'/'+totalItems+' ítems completados</span><span>'+progressPct+'%</span></div><div style="height:4px;background:rgba(100,116,139,.15);border-radius:2px;overflow:hidden"><div style="height:100%;width:'+progressPct+'%;background:linear-gradient(90deg,var(--mint),var(--emerald));border-radius:2px;transition:width .3s"></div></div></div>';
     html+='<ul class="ac-actions">';
-    a.actions.forEach((act,i)=>{
-      const cbId=a.id+'_cb_'+i;
+    a.items.forEach((item,j)=>{
+      const cbId=actId+'_'+j;
       const checked=localStorage.getItem(cbId)==='true'?'checked':'';
-      html+='<li><input type="checkbox" id="ctx_'+cbId+'" '+checked+' onchange="syncCheckbox(\''+cbId+'\',this.checked)"><label for="ctx_'+cbId+'">'+act+'</label></li>';
+      html+='<li><input type="checkbox" id="'+cbId+'" '+checked+' onchange="onAreaContextCheckbox(\''+cbId+'\',this.checked,\''+areaKey+'\')"><label for="'+cbId+'">'+item+'</label></li>';
     });
-    html+='</ul>';
-    html+='<div class="ac-footer"><div class="ac-impact">Estado: <span style="color:'+(savedStatus==='done'?'var(--emerald)':savedStatus==='progress'?'var(--amber)':'var(--gray)')+'">'+(savedStatus==='done'?'Completado':savedStatus==='progress'?'En progreso':'Pendiente')+'</span></div></div>';
-    html+='</div>';
+    html+='</ul></div>';
   });
   html+='</div>';
+  // Planes globales que también aplican a esta área
+  const globalActions=ACTIONS.filter(a=>a.areas.includes(areaKey));
+  if(globalActions.length){
+    html+='<h3 style="font-size:15px;font-weight:600;margin:20px 0 12px;color:#f1f5f9">Planes de acción globales que aplican <span style="font-size:11px;color:var(--gray);font-weight:400">(sincronizados con tab Planes de Acción)</span></h3>';
+    html+='<div class="action-grid">';
+    globalActions.forEach(a=>{
+      const savedStatus=localStorage.getItem('action_status_'+a.id)||'pending';
+      const totalItems=a.actions.length;
+      let checkedItems=0;
+      a.actions.forEach((act,i)=>{if(localStorage.getItem(a.id+'_cb_'+i)==='true')checkedItems++});
+      const progressPct=Math.round(checkedItems/totalItems*100);
+      html+='<div class="action-card '+a.priority+'" data-status="'+savedStatus+'">';
+      html+='<div class="ac-header"><div class="ac-title">'+a.title+'</div><div class="ac-badge '+a.priority+'">'+(a.priority==='high'?'ALTA':'MEDIA')+'</div></div>';
+      html+='<div class="ac-desc">'+a.desc+'</div>';
+      html+='<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--gray);margin-bottom:4px"><span>'+checkedItems+'/'+totalItems+' ítems</span><span>'+progressPct+'%</span></div><div style="height:4px;background:rgba(100,116,139,.15);border-radius:2px;overflow:hidden"><div style="height:100%;width:'+progressPct+'%;background:linear-gradient(90deg,var(--mint),var(--emerald));border-radius:2px"></div></div></div>';
+      html+='<ul class="ac-actions">';
+      a.actions.forEach((act,i)=>{
+        const cbId=a.id+'_cb_'+i;
+        const checked=localStorage.getItem(cbId)==='true'?'checked':'';
+        html+='<li><input type="checkbox" id="ctx_'+cbId+'" '+checked+' onchange="syncCheckbox(\''+cbId+'\',this.checked)" style="accent-color:var(--emerald);cursor:pointer"><label for="ctx_'+cbId+'">'+act+'</label></li>';
+      });
+      html+='</ul></div>';
+    });
+    html+='</div>';
+  }
   container.innerHTML=html;
 }
 
@@ -1274,6 +1296,11 @@ function syncCheckbox(cbId,checked){
   // Re-renderizar el contexto para actualizar barra de progreso
   const selector=document.getElementById('areaContextSelector');
   if(selector)renderAreaContext(selector.value);
+}
+function onAreaContextCheckbox(cbId,checked,areaKey){
+  localStorage.setItem(cbId,checked);
+  // Re-renderizar para actualizar barra de progreso
+  renderAreaContext(areaKey);
 }
 
 // ===== ACCORDION =====
